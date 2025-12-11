@@ -1,30 +1,10 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use server";
 
-import z from "zod";
 import { loginUser } from "./loginUser";
-
-const registerValidationZodSchema = z
-  .object({
-    fullName: z.string().min(1, { message: "Name is required" }),
-    email: z.email({ message: "Valid email is required" }),
-    password: z
-      .string()
-      .min(6, {
-        error: "Password is required and must be at least 6 characters long",
-      })
-      .max(100, {
-        error: "Password must be at most 100 characters long",
-      }),
-    confirmPassword: z.string().min(6, {
-      error:
-        "Confirm Password is required and must be at least 6 characters long",
-    }),
-  })
-  .refine((data: any) => data.password === data.confirmPassword, {
-    error: "Passwords do not match",
-    path: ["confirmPassword"],
-  });
+import { registerValidationZodSchema } from "@/zod/auth.validation";
+import { zodValidator } from "@/lib/zodValidator";
+import { serverFetch } from "@/lib/server-fetch";
 
 export const registerUser = async (
   _currentState: any,
@@ -32,47 +12,36 @@ export const registerUser = async (
 ): Promise<any> => {
   try {
     console.log(formData.get("fullName"));
-    const validationData = {
+    const payload = {
       fullName: formData.get("fullName"),
       email: formData.get("email"),
       password: formData.get("password"),
       confirmPassword: formData.get("confirmPassword"),
     };
 
-    const validatedFields =
-      registerValidationZodSchema.safeParse(validationData);
-
-    console.log(validatedFields, "val");
-
-    if (!validatedFields.success) {
-      return {
-        success: false,
-        errors: validatedFields.error.issues.map((issue) => {
-          return {
-            field: issue.path[0],
-            message: issue.message,
-          };
-        }),
-      };
+    if (zodValidator(payload, registerValidationZodSchema).success === false) {
+      return zodValidator(payload, registerValidationZodSchema);
     }
 
+    const validatedPayload: any = zodValidator(
+      payload,
+      registerValidationZodSchema
+    ).data;
+
     const registerData = {
-      fullName: formData.get("fullName"),
-      email: formData.get("email"),
-      password: formData.get("password"),
+      fullName: validatedPayload.fullName,
+      email: validatedPayload.email,
+      password: validatedPayload.password,
     };
 
     const newFormData = new FormData();
 
     newFormData.append("data", JSON.stringify(registerData));
 
-    const res = await fetch("http://localhost:5000/api/v1/user/create-user", {
-      method: "POST",
+    const res = await serverFetch.post("/user/create-user", {
       body: newFormData,
     });
     const result = await res.json();
-
-    console.log(res, "res");
 
     if (result.success) {
       await loginUser(_currentState, formData);
