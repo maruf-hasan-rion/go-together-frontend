@@ -38,15 +38,15 @@ export const hostNavItems: NavSection[] = [
         title: "My Events",
         href: "/host/dashboard/my-events",
         icon: "Calendar",
-        badge: "3",
+        // badge: "3",
         roles: ["HOST"],
       },
-      {
-        title: "Participants",
-        href: "/host/dashboard/participants",
-        icon: "Users",
-        roles: ["HOST"],
-      },
+      // {
+      //   title: "Participants",
+      //   href: "/host/dashboard/participants",
+      //   icon: "Users",
+      //   roles: ["HOST"],
+      // },
       {
         title: "Reviews",
         href: "/host/dashboard/reviews",
@@ -58,12 +58,12 @@ export const hostNavItems: NavSection[] = [
   {
     title: "Financial",
     items: [
-      {
-        title: "Revenue",
-        href: "/host/dashboard/revenue",
-        icon: "DollarSign",
-        roles: ["HOST"],
-      },
+      // {
+      //   title: "Revenue",
+      //   href: "/host/dashboard/revenue",
+      //   icon: "DollarSign",
+      //   roles: ["HOST"],
+      // },
       {
         title: "Payments",
         href: "/host/dashboard/payments",
@@ -80,7 +80,7 @@ export const userNavItems: NavSection[] = [
     items: [
       {
         title: "Joined Events",
-        href: "/dashboard/joined-events",
+        href: "/dashboard/my-bookings",
         icon: "Calendar",
         roles: ["USER"],
       },
@@ -99,22 +99,33 @@ export const userNavItems: NavSection[] = [
     ],
   },
   {
-    title: "Social",
+    title: "Beacome a Host",
     items: [
       {
-        title: "My Reviews",
-        href: "/dashboard/my-reviews",
-        icon: "MessageSquare",
-        roles: ["USER"],
-      },
-      {
-        title: "Notifications",
-        href: "/dashboard/notifications",
-        icon: "Bell",
+        title: "Become a Host",
+        href: "/dashboard/become-host",
+        icon: "HomePlus",
         roles: ["USER"],
       },
     ],
   },
+  // {
+  //   title: "Social",
+  //   items: [
+  //     {
+  //       title: "My Reviews",
+  //       href: "/dashboard/my-reviews",
+  //       icon: "MessageSquare",
+  //       roles: ["USER"],
+  //     },
+  //     {
+  //       title: "Notifications",
+  //       href: "/dashboard/notifications",
+  //       icon: "Bell",
+  //       roles: ["USER"],
+  //     },
+  //   ],
+  // },
 ];
 
 export const adminNavItems: NavSection[] = [
@@ -139,6 +150,29 @@ export const adminNavItems: NavSection[] = [
         icon: "Shield",
         roles: ["ADMIN"],
       },
+    ],
+  },
+  {
+    title: "Host Management",
+    items: [
+      // {
+      //   title: "All Hosts",
+      //   href: "/admin/dashboard/hosts-management",
+      //   icon: "UserCheck",
+      //   roles: ["ADMIN"],
+      // },
+      {
+        title: "Host Applications",
+        href: "/admin/dashboard/host-applications",
+        icon: "UserCheck",
+        roles: ["ADMIN"],
+      },
+      // {
+      //   title: "Admins",
+      //   href: "/admin/dashboard/admins-management",
+      //   icon: "Shield",
+      //   roles: ["ADMIN"],
+      // },
     ],
   },
   {

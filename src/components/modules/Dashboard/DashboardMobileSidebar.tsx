@@ -3,7 +3,7 @@
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
-import { SheetTitle } from "@/components/ui/sheet";
+import { SheetClose, SheetTitle } from "@/components/ui/sheet";
 import { getIconComponent } from "@/lib/icon-mapper";
 import { cn } from "@/lib/utils";
 import { NavSection } from "@/types/dashboard.interface";
@@ -20,14 +20,14 @@ interface DashboardMobileSidebarContentProps {
 const DashboardMobileSidebar = ({
   userInfo,
   navItems,
-  dashboardHome,
+  // dashboardHome,
 }: DashboardMobileSidebarContentProps) => {
   const pathname = usePathname();
   return (
     <div className=" flex h-full flex-col">
       {/* Logo */}
       <div className="flex h-16 items-center border-b px-6">
-        <Link href={dashboardHome}>
+        <Link href={"/"}>
           <span className="text-xl font-bold text-primary">GoTogether</span>
         </Link>
       </div>
@@ -49,6 +49,7 @@ const DashboardMobileSidebar = ({
                   const Icon = getIconComponent(item.icon);
 
                   return (
+                     <SheetClose asChild key={item.href}>
                     <Link
                       key={item.href}
                       href={item.href}
@@ -67,6 +68,7 @@ const DashboardMobileSidebar = ({
                         </Badge>
                       )}
                     </Link>
+                     </SheetClose>
                   );
                 })}
               </div>
@@ -83,11 +85,11 @@ const DashboardMobileSidebar = ({
         <div className="flex items-center gap-3">
           <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center">
             <span className="text-sm font-semibold text-primary">
-              {userInfo.name.charAt(0).toUpperCase()}
+              {userInfo.fullName.charAt(0).toUpperCase()}
             </span>
           </div>
           <div className="flex-1 overflow-hidden">
-            <p className="text-sm font-medium truncate">{userInfo.name}</p>
+            <p className="text-sm font-medium truncate">{userInfo.fullName}</p>
             <p className="text-xs text-muted-foreground capitalize">
               {userInfo.role.toLowerCase()}
             </p>
