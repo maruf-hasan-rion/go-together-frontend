@@ -18,10 +18,9 @@ import {
 import { AdminAnalyticsData } from "@/types/meta.interface";
 import AdminFeatures from "@/components/modules/Admin/AdminFeatures";
 
-const AdminDashboard = async () => {
+const AdminDashboard = ({ analytics }: { analytics: AdminAnalyticsData }) => {
 
-  const response = await getAnalytics();
-  const analytics = response.data as AdminAnalyticsData;
+  
 
   return (
     <div className="space-y-4">
