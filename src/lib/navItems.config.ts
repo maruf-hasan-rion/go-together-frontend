@@ -184,43 +184,43 @@ export const adminNavItems: NavSection[] = [
         icon: "Calendar",
         roles: ["ADMIN"],
       },
-      {
-        title: "Event Categories",
-        href: "/admin/dashboard/categories-management",
-        icon: "Grid",
-        roles: ["ADMIN"],
-      },
-      {
-        title: "Reported Events",
-        href: "/admin/dashboard/reported-events",
-        icon: "Flag",
-        roles: ["ADMIN"],
-      },
+      // {
+      //   title: "Event Categories",
+      //   href: "/admin/dashboard/categories-management",
+      //   icon: "Grid",
+      //   roles: ["ADMIN"],
+      // },
+      // {
+      //   title: "Reported Events",
+      //   href: "/admin/dashboard/reported-events",
+      //   icon: "Flag",
+      //   roles: ["ADMIN"],
+      // },
     ],
   },
-  {
-    title: "Platform Analytics",
-    items: [
-      {
-        title: "Revenue",
-        href: "/admin/dashboard/revenue",
-        icon: "TrendingUp",
-        roles: ["ADMIN"],
-      },
-      {
-        title: "Reviews",
-        href: "/admin/dashboard/reviews-management",
-        icon: "Star",
-        roles: ["ADMIN"],
-      },
-      {
-        title: "Settings",
-        href: "/admin/dashboard/settings",
-        icon: "Settings",
-        roles: ["ADMIN"],
-      },
-    ],
-  },
+  // {
+  //   title: "Platform Analytics",
+  //   items: [
+  //     {
+  //       title: "Revenue",
+  //       href: "/admin/dashboard/revenue",
+  //       icon: "TrendingUp",
+  //       roles: ["ADMIN"],
+  //     },
+  //     {
+  //       title: "Reviews",
+  //       href: "/admin/dashboard/reviews-management",
+  //       icon: "Star",
+  //       roles: ["ADMIN"],
+  //     },
+  //     {
+  //       title: "Settings",
+  //       href: "/admin/dashboard/settings",
+  //       icon: "Settings",
+  //       roles: ["ADMIN"],
+  //     },
+  //   ],
+  // },
 ];
 
 export const getNavItemsByRole = (role: UserRole): NavSection[] => {

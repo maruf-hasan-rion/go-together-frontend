@@ -58,7 +58,7 @@ export default function BecomeHost() {
     },
   ];
   const [state, formAction, isPending] = useActionState(createHostApplication, null);
-
+console.log(state,formAction,isPending);
 useEffect(() => {
   if (!state) return;
 
