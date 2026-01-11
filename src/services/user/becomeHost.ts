@@ -1,10 +1,11 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use server";
 
+import { z } from "zod";
+import { revalidateTag } from "next/cache";
+
 import { zodValidator } from "@/lib/zodValidator";
 import { serverFetch } from "@/lib/server-fetch";
-import { revalidateTag } from "next/cache";
-import { z } from "zod";
 
 const createHostApplicationSchema = z.object({
   message: z.string().min(10, "Please tell us more about yourself"),
@@ -19,7 +20,6 @@ export const createHostApplication = async (
   };
 
   const validated = zodValidator(payload, createHostApplicationSchema);
-  console.log("v", validated);
 
   if (!validated.success) {
     return {
@@ -30,17 +30,37 @@ export const createHostApplication = async (
     };
   }
 
-  const res = await serverFetch.post("/auth/apply-host", {
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(validated.data),
-  });
+  try {
+    // IMPORTANT: server action -> backend call should hit your API base URL inside serverFetch
+    const res = await serverFetch.post("/auth/apply-host", {
+      // ✅ Don’t set Content-Type manually unless you’re 100% sure serverFetch doesn’t do it
+      body: JSON.stringify(validated.data),
+      cache: "no-store",
+    });
 
-  const result = await res.json();
-  console.log(result);
+    // ✅ Safe parse (prevents "Unexpected end of JSON input")
+    const text = await res.text();
+    const result = text ? JSON.parse(text) : null;
 
-  if (result.success) {
-    revalidateTag("host-application", { expire: 0 });
+    if (!res.ok) {
+      return {
+        success: false,
+        message: result?.message || res.statusText || "Request failed",
+      };
+    }
+
+    if (result?.success) {
+      revalidateTag("host-application", { expire: 0 });
+      // (optional) if you show host status anywhere else:
+      revalidateTag("me", { expire: 0 });
+      revalidateTag("user", { expire: 0 });
+    }
+
+    return result;
+  } catch (error: any) {
+    return {
+      success: false,
+      message: error?.message || "Something went wrong",
+    };
   }
-
-  return result;
 };

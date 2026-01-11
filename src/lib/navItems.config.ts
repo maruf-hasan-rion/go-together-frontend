@@ -90,12 +90,12 @@ export const userNavItems: NavSection[] = [
         icon: "Search",
         roles: ["USER"],
       },
-      {
-        title: "Saved Events",
-        href: "/dashboard/saved-events",
-        icon: "Bookmark",
-        roles: ["USER"],
-      },
+      // {
+      //   title: "Saved Events",
+      //   href: "/dashboard/saved-events",
+      //   icon: "Bookmark",
+      //   roles: ["USER"],
+      // },
     ],
   },
   {

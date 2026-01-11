@@ -2,7 +2,6 @@
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
-import { useState } from "react";
 import {
   Star,
   TrendingUp,
@@ -10,17 +9,45 @@ import {
   Users,
   Calendar,
   DollarSign,
-  ArrowRight,
 } from "lucide-react";
+
+
+// const BecomeHost = () => {
+//   //   const [selectedTypes, setSelectedTypes] = useState<string[]>([]);
+//   const [formData, setFormData] = useState({
+//     message: "",
+//   });
+
+ 
+
+//   const onSubmit = async (e: React.FormEvent) => {
+//     e.preventDefault();
+
+//     const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/auth/apply-host`, {
+//       method: "POST",
+//       headers: { "Content-Type": "application/json" },
+//       body: JSON.stringify({ message: formData.message }),
+//     });
+
+//     const data = await res.json();
+
+//     if (!res.ok || data?.success === false) {
+//       console.log(data?.message ?? "Failed");
+//       // here you can show toast
+//       return;
+//     }
+
+//     setFormData((p) => ({ ...p, message: "" }));
+//     // toast success if you want
+//   };
+
+
+import { useActionState, useEffect } from "react";
+import { toast } from "sonner";
 import { createHostApplication } from "@/services/user/becomeHost";
 
-const BecomeHost = () => {
-  //   const [selectedTypes, setSelectedTypes] = useState<string[]>([]);
-  const [formData, setFormData] = useState({
-    message: "",
-  });
-
-  const benefits = [
+export default function BecomeHost() {
+   const benefits = [
     {
       icon: DollarSign,
       title: "Earn Money",
@@ -64,27 +91,15 @@ const BecomeHost = () => {
       bg: "bg-pink-50",
     },
   ];
+  const [state, formAction, isPending] = useActionState(createHostApplication, null);
 
-  const onSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  useEffect(() => {
+    if (!state) return;
 
-    const res = await fetch("/auth/apply-host", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ message: formData.message }),
-    });
+    if (state.success) toast.success(state.message || "Applied successfully!");
+    else toast.error(state.message || "Failed");
+  }, [state]);
 
-    const data = await res.json();
-
-    if (!res.ok || data?.success === false) {
-      console.log(data?.message ?? "Failed");
-      // here you can show toast
-      return;
-    }
-
-    setFormData((p) => ({ ...p, message: "" }));
-    // toast success if you want
-  };
 
   return (
     <div className="min-h-screen bg-white">
@@ -138,38 +153,25 @@ const BecomeHost = () => {
               hours
             </p>
           </div>
-          <form
-            onSubmit={onSubmit}
-            className="bg-white rounded-2xl shadow-xl p-8 space-y-6"
-          >
-            <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-2">
-                Tell us about yourself *
-              </label>
-              <textarea
-                name="message"
-                rows={4}
-                value={formData.message}
-                onChange={(e) =>
-                  setFormData({ ...formData, message: e.target.value })
-                }
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                placeholder="Share your experience, passion, and why you want to become a host..."
-              />
-            </div>
+         <form action={formAction} className="space-y-4">
+      <textarea
+        name="message"
+        rows={4}
+        className="w-full border p-3"
+        placeholder="Tell us about yourself..."
+      />
 
-            <button
-              type="submit"
-              className="w-full bg-linear-to-r from-blue-600 to-indigo-600 text-white py-4 rounded-lg hover:from-blue-700 hover:to-indigo-700 transition-all font-semibold text-lg flex items-center justify-center gap-2"
-            >
-              Submit Application
-              <ArrowRight className="w-5 h-5" />
-            </button>
-          </form>
+      <button
+        type="submit"
+        disabled={isPending}
+        className="px-4 py-2 bg-black text-white"
+      >
+        {isPending ? "Submitting..." : "Submit"}
+      </button>
+    </form>
         </div>
       </section>
     </div>
   );
 };
 
-export default BecomeHost;
