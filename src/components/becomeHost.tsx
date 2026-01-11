@@ -1,7 +1,5 @@
 "use client";
 
-/* eslint-disable @typescript-eslint/no-explicit-any */
-
 import {
   Star,
   TrendingUp,
@@ -10,38 +8,6 @@ import {
   Calendar,
   DollarSign,
 } from "lucide-react";
-
-
-// const BecomeHost = () => {
-//   //   const [selectedTypes, setSelectedTypes] = useState<string[]>([]);
-//   const [formData, setFormData] = useState({
-//     message: "",
-//   });
-
- 
-
-//   const onSubmit = async (e: React.FormEvent) => {
-//     e.preventDefault();
-
-//     const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/auth/apply-host`, {
-//       method: "POST",
-//       headers: { "Content-Type": "application/json" },
-//       body: JSON.stringify({ message: formData.message }),
-//     });
-
-//     const data = await res.json();
-
-//     if (!res.ok || data?.success === false) {
-//       console.log(data?.message ?? "Failed");
-//       // here you can show toast
-//       return;
-//     }
-
-//     setFormData((p) => ({ ...p, message: "" }));
-//     // toast success if you want
-//   };
-
-
 import { useActionState, useEffect } from "react";
 import { toast } from "sonner";
 import { createHostApplication } from "@/services/user/becomeHost";
@@ -93,13 +59,12 @@ export default function BecomeHost() {
   ];
   const [state, formAction, isPending] = useActionState(createHostApplication, null);
 
-  useEffect(() => {
-    if (!state) return;
+useEffect(() => {
+  if (!state) return;
 
-    if (state.success) toast.success(state.message || "Applied successfully!");
-    else toast.error(state.message || "Failed");
-  }, [state]);
-
+  if (state.success) toast.success(state.message);
+  else toast.error(state.message);
+}, [state]);
 
   return (
     <div className="min-h-screen bg-white">

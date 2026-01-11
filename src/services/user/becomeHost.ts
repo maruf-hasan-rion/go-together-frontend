@@ -3,7 +3,6 @@
 
 import { z } from "zod";
 import { revalidateTag } from "next/cache";
-
 import { zodValidator } from "@/lib/zodValidator";
 import { serverFetch } from "@/lib/server-fetch";
 
@@ -15,9 +14,7 @@ export const createHostApplication = async (
   _currentState: any,
   formData: FormData
 ) => {
-  const payload = {
-    message: formData.get("message"),
-  };
+  const payload = { message: formData.get("message") };
 
   const validated = zodValidator(payload, createHostApplicationSchema);
 
@@ -31,16 +28,18 @@ export const createHostApplication = async (
   }
 
   try {
-    // IMPORTANT: server action -> backend call should hit your API base URL inside serverFetch
     const res = await serverFetch.post("/auth/apply-host", {
-      // ✅ Don’t set Content-Type manually unless you’re 100% sure serverFetch doesn’t do it
       body: JSON.stringify(validated.data),
       cache: "no-store",
     });
 
-    // ✅ Safe parse (prevents "Unexpected end of JSON input")
     const text = await res.text();
-    const result = text ? JSON.parse(text) : null;
+
+    // ✅ Always return a valid object
+    const result =
+      text && text.trim().length > 0
+        ? JSON.parse(text)
+        : { success: false, message: "Empty response from server" };
 
     if (!res.ok) {
       return {
@@ -51,12 +50,14 @@ export const createHostApplication = async (
 
     if (result?.success) {
       revalidateTag("host-application", { expire: 0 });
-      // (optional) if you show host status anywhere else:
       revalidateTag("me", { expire: 0 });
-      revalidateTag("user", { expire: 0 });
     }
 
-    return result;
+    return {
+      success: Boolean(result?.success),
+      message: result?.message || (result?.success ? "Success" : "Failed"),
+      ...result,
+    };
   } catch (error: any) {
     return {
       success: false,
