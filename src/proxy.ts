@@ -1,4 +1,3 @@
-import jwt, { JwtPayload } from "jsonwebtoken";
 import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
 import {
@@ -7,6 +6,7 @@ import {
   isAuthRoute,
   UserRole,
 } from "./lib/auth-utils";
+import { decodeJwt } from "./lib/jwt-decode";
 import { deleteCookie, getCookie } from "./services/auth/tokenHandlers";
 import { getNewAccessToken } from "./services/auth/auth.service";
 
@@ -33,18 +33,17 @@ export async function proxy(request: NextRequest) {
 
   let userRole: UserRole | null = null;
   if (accessToken) {
-    const verifiedToken: JwtPayload | string = jwt.verify(
-      accessToken,
-      process.env.JWT_SECRET as string
-    );
+    // Unsigned decode — the signing secret never ships to the frontend.
+    // Route guards are UX-level; the backend enforces authorization.
+    const decoded = decodeJwt(accessToken);
 
-    if (typeof verifiedToken === "string") {
+    if (!decoded || decoded.expired || !decoded.payload.role) {
       await deleteCookie("accessToken");
       await deleteCookie("refreshToken");
       return NextResponse.redirect(new URL("/login", request.url));
     }
 
-    userRole = verifiedToken.role;
+    userRole = decoded.payload.role as UserRole;
   }
 
   const routerOwner = getRouteOwner(pathname);

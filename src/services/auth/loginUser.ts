@@ -7,8 +7,8 @@ import {
   UserRole,
 } from "@/lib/auth-utils";
 import { parse } from "cookie";
-import jwt, { JwtPayload } from "jsonwebtoken";
 import { redirect } from "next/navigation";
+import { decodeJwt } from "@/lib/jwt-decode";
 import { setCookie } from "./tokenHandlers";
 import { loginValidationZodSchema } from "@/zod/auth.validation";
 import { zodValidator } from "@/lib/zodValidator";
@@ -86,16 +86,13 @@ export const loginUser = async (
       path: refreshTokenObject.Path || "/",
       sameSite: refreshTokenObject["SameSite"] || "none",
     });
-    const verifiedToken: JwtPayload | string = jwt.verify(
-      accessTokenObject.accessToken,
-      process.env.JWT_SECRET as string
-    );
+    const decoded = decodeJwt(accessTokenObject.accessToken);
 
-    if (typeof verifiedToken === "string") {
+    if (!decoded || decoded.expired || !decoded.payload.role) {
       throw new Error("Invalid token");
     }
 
-    const userRole: UserRole = verifiedToken.role;
+    const userRole: UserRole = decoded.payload.role as UserRole;
 
     if (!result.success) {
       throw new Error(result.message || "Login failed");

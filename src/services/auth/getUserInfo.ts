@@ -2,8 +2,8 @@
 "use server";
 
 import { serverFetch } from "@/lib/server-fetch";
+import { decodeJwt } from "@/lib/jwt-decode";
 import { UserInfo } from "@/types/user.interface";
-import jwt, { JwtPayload } from "jsonwebtoken";
 import { getCookie } from "./tokenHandlers";
 
 export const getUserInfo = async (): Promise<UserInfo | any> => {
@@ -22,21 +22,21 @@ export const getUserInfo = async (): Promise<UserInfo | any> => {
         throw new Error("No access token found");
       }
 
-      const verifiedToken = jwt.verify(
-        accessToken,
-        process.env.JWT_SECRET as string
-      ) as JwtPayload;
+      const decoded = decodeJwt(accessToken);
+      const tokenRole =
+        decoded && !decoded.expired ? (decoded.payload.role as string) : "USER";
+      const tokenEmail = decoded?.payload.email as string | undefined;
+
       userInfo = {
-        name: verifiedToken.name || "Unknown User",
-        email: verifiedToken.email,
-        role: verifiedToken.role,
+        name: "Unknown User",
+        email: tokenEmail,
+        role: tokenRole,
       };
     }
     userInfo = {
       name: result.data.fullName || "Unknown User",
       ...result.data,
     };
-    // console.log("u2", userInfo);
     return userInfo;
   } catch (error: any) {
     console.log(error);
