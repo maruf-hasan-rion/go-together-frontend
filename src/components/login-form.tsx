@@ -7,6 +7,7 @@ import { Field, FieldDescription, FieldGroup, FieldLabel } from "./ui/field";
 import { Input } from "./ui/input";
 import { toast } from "sonner";
 import Link from "next/link";
+import GoogleLoginButton from "./google-login-button";
 import InputFieldError from "./shared/InputFieldError";
 
 const LoginForm = ({ redirect }: { redirect?: string }) => {
@@ -39,7 +40,15 @@ const LoginForm = ({ redirect }: { redirect?: string }) => {
 
           {/* Password */}
           <Field>
-            <FieldLabel htmlFor="password">Password</FieldLabel>
+            <div className="flex items-center justify-between">
+              <FieldLabel htmlFor="password">Password</FieldLabel>
+              <Link
+                href="/forgot-password"
+                className="text-sm text-gray-500 hover:underline"
+              >
+                Forgot password?
+              </Link>
+            </div>
             <Input
               id="password"
               name="password"
@@ -54,6 +63,14 @@ const LoginForm = ({ redirect }: { redirect?: string }) => {
             <Button type="submit" disabled={isPending}>
               {isPending ? "Logging in..." : "Login"}
             </Button>
+
+            <div className="my-2 flex items-center gap-3">
+              <span className="h-px flex-1 bg-gray-200" />
+              <span className="text-xs text-gray-400">or</span>
+              <span className="h-px flex-1 bg-gray-200" />
+            </div>
+
+            <GoogleLoginButton />
 
             <FieldDescription className="px-6 text-center">
               Don&apos;t have an account?{" "}

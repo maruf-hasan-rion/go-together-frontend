@@ -37,3 +37,23 @@ export const loginValidationZodSchema = z.object({
       error: "Password must be at most 100 characters long",
     }),
 });
+
+export const forgotPasswordZodSchema = z.object({
+  email: z.email({ message: "Valid email is required" }),
+});
+
+export const resetPasswordZodSchema = z
+  .object({
+    token: z.string().min(1, { message: "Reset token is required" }),
+    newPassword: z
+      .string()
+      .min(6, { message: "Password must be at least 6 characters long" })
+      .max(100, { message: "Password must be at most 100 characters long" }),
+    confirmPassword: z
+      .string()
+      .min(6, { message: "Confirm password must be at least 6 characters long" }),
+  })
+  .refine((data: any) => data.newPassword === data.confirmPassword, {
+    message: "Passwords do not match",
+    path: ["confirmPassword"],
+  });
