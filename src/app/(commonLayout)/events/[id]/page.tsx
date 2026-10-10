@@ -2,45 +2,48 @@
 // import { Card, CardContent } from "@/components/ui/card";
 
 import { getSingleEvent } from "@/services/events/events";
+import { getMyReviewForEvent } from "@/services/reviews/reviews";
 import { getUserInfo } from "@/services/auth/getUserInfo";
 // import { ApiParticipantInfo } from "@/types/event.interface";
 import EventDetailsCard from "@/components/modules/Events/EventDetailsCard";
 import { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Event-Details - Explore Event Info & Participants | Eventra",
-  description:
-    "Explore detailed information about events, including date, time, location, and participant list. Connect with other attendees and get involved in exciting activities through Eventra's event management platform.",
-  keywords: [
-    "all events",
-    "upcoming events",
-    "browse events",
-    "event listing",
-    "event filter",
-    "concerts",
-    "workshops",
-    "sports events",
-    "festivals",
-  ],
-  authors: [{ name: "Eventra Team" }],
+	title: "Event-Details - Explore Event Info & Participants | Eventra",
+	description:
+		"Explore detailed information about events, including date, time, location, and participant list. Connect with other attendees and get involved in exciting activities through Eventra's event management platform.",
+	keywords: [
+		"all events",
+		"upcoming events",
+		"browse events",
+		"event listing",
+		"event filter",
+		"concerts",
+		"workshops",
+		"sports events",
+		"festivals",
+	],
+	authors: [{ name: "Eventra Team" }],
 };
 
 export default async function EventDetailsPage({
-  params,
+	params,
 }: {
-  params: Promise<{ id: string }>;
+	params: Promise<{ id: string }>;
 }) {
-      const { id } = await params;
-  const userInfo = await getUserInfo();
-  const userId = userInfo?.id ?? null;
+	const { id } = await params;
+	const userInfo = await getUserInfo();
+	const userId = userInfo?.id ?? null;
 
-  const result = await getSingleEvent(id);
-  const event = result?.data;
-//   console.log("uuu",event);
+	const result = await getSingleEvent(id);
+	const event = result?.data;
 
+	const reviewRes = userId ? await getMyReviewForEvent(id) : null;
+	const hasReviewed = !!reviewRes?.data;
 
-
-  return <EventDetailsCard event={event} userId={userId} />;
+	return (
+		<EventDetailsCard event={event} userId={userId} hasReviewed={hasReviewed} />
+	);
 }
 // const formatDate = (iso?: string) => {
 //     if (!iso) return { date: "", time: "" };

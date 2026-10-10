@@ -4,6 +4,7 @@
 import { serverFetch } from "@/lib/server-fetch";
 import { zodValidator } from "@/lib/zodValidator";
 import {
+  changePasswordZodSchema,
   forgotPasswordZodSchema,
   resetPasswordZodSchema,
 } from "@/zod/auth.validation";
@@ -30,6 +31,46 @@ export const forgotPassword = async (_prevState: any, formData: FormData): Promi
       message:
         result?.message ||
         "If the account exists, a password reset link has been sent.",
+    };
+  } catch (error: any) {
+    return {
+      success: false,
+      message:
+        process.env.NODE_ENV === "development"
+          ? error.message
+          : "Something went wrong. Please try again.",
+    };
+  }
+};
+
+export const changePassword = async (_prevState: any, formData: FormData): Promise<any> => {
+  const payload = {
+    oldPassword: formData.get("oldPassword"),
+    newPassword: formData.get("newPassword"),
+    confirmPassword: formData.get("confirmPassword"),
+  };
+
+  const validated = zodValidator(payload, changePasswordZodSchema);
+  if (!validated.success) {
+    return { ...validated, formData: payload };
+  }
+
+  try {
+    const response = await serverFetch.post("/auth/change-password", {
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        oldPassword: validated.data?.oldPassword,
+        newPassword: validated.data?.newPassword,
+      }),
+      cache: "no-store",
+    });
+
+    const result = await response.json();
+
+    return {
+      success: Boolean(result?.success),
+      message: result?.message || "Password changed successfully.",
+      redirectToLogin: Boolean(result?.success),
     };
   } catch (error: any) {
     return {

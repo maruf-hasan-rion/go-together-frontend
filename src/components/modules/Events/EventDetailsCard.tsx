@@ -308,19 +308,19 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 
 import {
-  Calendar,
-  MapPin,
-  Users,
-  DollarSign,
-  Star,
-  ArrowLeft,
-  Clock,
-  CheckCircle2,
-  AlertCircle,
-  Edit,
-  Share2,
-  Heart,
-  Info,
+	Calendar,
+	MapPin,
+	Users,
+	DollarSign,
+	Star,
+	ArrowLeft,
+	Clock,
+	CheckCircle2,
+	AlertCircle,
+	Edit,
+	Share2,
+	Heart,
+	Info,
 } from "lucide-react";
 
 import { formatDateTime, formatCurrency, getInitials } from "@/lib/utils";
@@ -329,376 +329,389 @@ import { joinEvent } from "@/services/events/events";
 import { ReviewDialog } from "../Reviews/ReviewDialog";
 
 export default function EventDetailsCard({
-  event,
-  userId,
+	event,
+	userId,
+	hasReviewed = false,
 }: {
-  event: any;
-  userId: string | null;
+	event: any;
+	userId: string | null;
+	hasReviewed?: boolean;
 }) {
-  const router = useRouter();
-  const [joining, setJoining] = useState(false);
+	const router = useRouter();
+	const [joining, setJoining] = useState(false);
 
-  if (!event) {
-    return (
-      <div className="min-h-screen flex flex-col">
-        <div className="flex-1 flex items-center justify-center p-4">
-          <Card className="max-w-md w-full">
-            <CardContent className="text-center py-12">
-              <div className="w-16 h-16 rounded-full bg-muted flex items-center justify-center mx-auto mb-4">
-                <AlertCircle className="h-8 w-8 text-muted-foreground" />
-              </div>
-              <h2 className="text-2xl font-bold mb-2">Event Not Found</h2>
-              <p className="text-muted-foreground mb-6">
-                The event you're looking for doesn't exist or has been removed
-              </p>
-              <Link href="/events">
-                <Button>Browse Events</Button>
-              </Link>
-            </CardContent>
-          </Card>
-        </div>
-      </div>
-    );
-  }
+	if (!event) {
+		return (
+			<div className="min-h-screen flex flex-col">
+				<div className="flex-1 flex items-center justify-center p-4">
+					<Card className="max-w-md w-full">
+						<CardContent className="text-center py-12">
+							<div className="w-16 h-16 rounded-full bg-muted flex items-center justify-center mx-auto mb-4">
+								<AlertCircle className="h-8 w-8 text-muted-foreground" />
+							</div>
+							<h2 className="text-2xl font-bold mb-2">Event Not Found</h2>
+							<p className="text-muted-foreground mb-6">
+								The event you're looking for doesn't exist or has been removed
+							</p>
+							<Link href="/events">
+								<Button>Browse Events</Button>
+							</Link>
+						</CardContent>
+					</Card>
+				</div>
+			</div>
+		);
+	}
 
-  // ✅ Align backend fields here
-  const eventImage = event.image;         // backend: image
-  const eventTitle = event.title;         // backend: title
-  const eventDate = event.eventDate;      // backend: eventDate
+	// ✅ Align backend fields here
+	const eventImage = event.image; // backend: image
+	const eventTitle = event.title; // backend: title
+	const eventDate = event.eventDate; // backend: eventDate
 
-  const bookedCount =
-    event?.bookings?.filter((b: any) => b.status === "CONFIRMED").length || 0;
+	const bookedCount =
+		event?.bookings?.filter((b: any) => b.status === "CONFIRMED").length || 0;
 
-  const spotsLeft = event.maxParticipants - bookedCount;
-  const isFull = event.status === "FULL" || spotsLeft <= 0;
+	const spotsLeft = event.maxParticipants - bookedCount;
+	const isFull = event.status === "FULL" || spotsLeft <= 0;
 
-  const isHost = userId && userId === event.hostId;
-  const userBooking = userId
-    ? event?.bookings?.find((b: any) => b.userId === userId)
-    : null;
+	const isHost = userId && userId === event.hostId;
+	const userBooking = userId
+		? event?.bookings?.find((b: any) => b.userId === userId)
+		: null;
 
-  const hasJoined = !!userBooking;
-  const canReview = userBooking?.status === "CONFIRMED";
+	const hasJoined = !!userBooking;
+	const canReview = userBooking?.status === "CONFIRMED";
 
-  const handleJoinEvent = async () => {
-    setJoining(true);
-    try {
-      const result = await joinEvent(event.id);
+	const handleJoinEvent = async () => {
+		setJoining(true);
+		try {
+			const result = await joinEvent(event.id);
 
-      if (result?.success) {
-        toast.success("You have successfully joined this event! 🎉");
-        setTimeout(() => router.push("/dashboard/my-bookings"), 1500);
-      } else {
-        toast.error(result?.message || "Failed to join");
-      }
-    } catch (error: any) {
-      toast.error(error?.response?.data?.message || "Something went wrong");
-    } finally {
-      setJoining(false);
-    }
-  };
+			if (result?.success) {
+				toast.success("You have successfully joined this event! 🎉");
+				setTimeout(() => router.push("/dashboard/my-bookings"), 1500);
+			} else {
+				toast.error(result?.message || "Failed to join");
+			}
+		} catch (error: any) {
+			toast.error(error?.response?.data?.message || "Something went wrong");
+		} finally {
+			setJoining(false);
+		}
+	};
 
-  return (
-    <div className="min-h-screen flex flex-col bg-gradient-to-b from-background to-muted/30">
-      {/* Hero */}
-      <div className="relative h-64 md:h-96 lg:h-[500px] w-full">
-        {eventImage ? (
-          <Image
-            src={eventImage}
-            alt={eventTitle}
-            fill
-            className="object-cover"
-            priority
-          />
-        ) : (
-          <div className="w-full h-full bg-gradient-to-br from-primary/20 via-purple-500/20 to-pink-500/20 flex items-center justify-center">
-            <Calendar className="h-24 w-24 md:h-32 md:w-32 text-primary/50" />
-          </div>
-        )}
+	return (
+		<div className="min-h-screen flex flex-col bg-gradient-to-b from-background to-muted/30">
+			{/* Hero */}
+			<div className="relative h-64 md:h-96 lg:h-[500px] w-full">
+				{eventImage ? (
+					<Image
+						src={eventImage}
+						alt={eventTitle}
+						fill
+						className="object-cover"
+						priority
+					/>
+				) : (
+					<div className="w-full h-full bg-gradient-to-br from-primary/20 via-purple-500/20 to-pink-500/20 flex items-center justify-center">
+						<Calendar className="h-24 w-24 md:h-32 md:w-32 text-primary/50" />
+					</div>
+				)}
 
-        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent" />
+				<div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent" />
 
-        <div className="absolute inset-0 flex flex-col justify-between p-4 md:p-8">
-          <div className="flex items-start justify-between">
-            <Button
-              variant="secondary"
-              size="sm"
-              onClick={() => router.back()}
-              className="backdrop-blur-sm bg-white/90 hover:bg-white shadow-lg"
-            >
-              <ArrowLeft className="h-4 w-4 mr-2" />
-              Back
-            </Button>
+				<div className="absolute inset-0 flex flex-col justify-between p-4 md:p-8">
+					<div className="flex items-start justify-between">
+						<Button
+							variant="secondary"
+							size="sm"
+							onClick={() => router.back()}
+							className="backdrop-blur-sm bg-white/90 hover:bg-white shadow-lg"
+						>
+							<ArrowLeft className="h-4 w-4 mr-2" />
+							Back
+						</Button>
 
-            <div className="flex gap-2">
-              <Button
-                variant="secondary"
-                size="icon"
-                className="backdrop-blur-sm bg-white/90 hover:bg-white shadow-lg"
-              >
-                <Share2 className="h-4 w-4" />
-              </Button>
-              <Button
-                variant="secondary"
-                size="icon"
-                className="backdrop-blur-sm bg-white/90 hover:bg-white shadow-lg"
-              >
-                <Heart className="h-4 w-4" />
-              </Button>
-            </div>
-          </div>
+						<div className="flex gap-2">
+							<Button
+								variant="secondary"
+								size="icon"
+								className="backdrop-blur-sm bg-white/90 hover:bg-white shadow-lg"
+							>
+								<Share2 className="h-4 w-4" />
+							</Button>
+							<Button
+								variant="secondary"
+								size="icon"
+								className="backdrop-blur-sm bg-white/90 hover:bg-white shadow-lg"
+							>
+								<Heart className="h-4 w-4" />
+							</Button>
+						</div>
+					</div>
 
-          <div className="space-y-3">
-            <div className="flex flex-wrap gap-2">
-              <Badge className="bg-white/90 text-foreground backdrop-blur-sm">
-                {Array.isArray(event.type) ? event.type.join(", ") : event.type}
-              </Badge>
+					<div className="space-y-3">
+						<div className="flex flex-wrap gap-2">
+							<Badge className="bg-white/90 text-foreground backdrop-blur-sm">
+								{Array.isArray(event.type) ? event.type.join(", ") : event.type}
+							</Badge>
 
-              {isFull && (
-                <Badge variant="destructive" className="backdrop-blur-sm">
-                  Event Full
-                </Badge>
-              )}
+							{isFull && (
+								<Badge variant="destructive" className="backdrop-blur-sm">
+									Event Full
+								</Badge>
+							)}
 
-              {event.joiningFee === 0 && (
-                <Badge className="bg-green-500 text-white backdrop-blur-sm">
-                  Free Event
-                </Badge>
-              )}
-            </div>
+							{event.joiningFee === 0 && (
+								<Badge className="bg-green-500 text-white backdrop-blur-sm">
+									Free Event
+								</Badge>
+							)}
+						</div>
 
-            <h1 className="text-3xl md:text-5xl lg:text-6xl font-bold text-white drop-shadow-lg">
-              {eventTitle}
-            </h1>
-          </div>
-        </div>
-      </div>
+						<h1 className="text-3xl md:text-5xl lg:text-6xl font-bold text-white drop-shadow-lg">
+							{eventTitle}
+						</h1>
+					</div>
+				</div>
+			</div>
 
-      {/* Main */}
-      <div className="container mx-auto px-4 py-8">
-        <div className="grid lg:grid-cols-3 gap-8">
-          {/* Left */}
-          <div className="lg:col-span-2 space-y-6">
-            {/* Quick Info */}
-            <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
-              <Card>
-                <CardContent className="p-4 flex items-center gap-3">
-                  <div className="w-12 h-12 rounded-lg bg-blue-500/10 flex items-center justify-center">
-                    <Calendar className="h-6 w-6 text-blue-500" />
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="text-xs text-muted-foreground">Date</p>
-                    <p className="text-sm font-medium truncate">
-                      {new Date(eventDate).toLocaleDateString()}
-                    </p>
-                  </div>
-                </CardContent>
-              </Card>
+			{/* Main */}
+			<div className="container mx-auto px-4 py-8">
+				<div className="grid lg:grid-cols-3 gap-8">
+					{/* Left */}
+					<div className="lg:col-span-2 space-y-6">
+						{/* Quick Info */}
+						<div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
+							<Card>
+								<CardContent className="p-4 flex items-center gap-3">
+									<div className="w-12 h-12 rounded-lg bg-blue-500/10 flex items-center justify-center">
+										<Calendar className="h-6 w-6 text-blue-500" />
+									</div>
+									<div className="flex-1 min-w-0">
+										<p className="text-xs text-muted-foreground">Date</p>
+										<p className="text-sm font-medium truncate">
+											{new Date(eventDate).toLocaleDateString()}
+										</p>
+									</div>
+								</CardContent>
+							</Card>
 
-              <Card>
-                <CardContent className="p-4 flex items-center gap-3">
-                  <div className="w-12 h-12 rounded-lg bg-green-500/10 flex items-center justify-center">
-                    <Clock className="h-6 w-6 text-green-500" />
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="text-xs text-muted-foreground">Time</p>
-                    <p className="text-sm font-medium">
-                      {new Date(eventDate).toLocaleTimeString("en-US", {
-                        hour: "2-digit",
-                        minute: "2-digit",
-                      })}
-                    </p>
-                  </div>
-                </CardContent>
-              </Card>
+							<Card>
+								<CardContent className="p-4 flex items-center gap-3">
+									<div className="w-12 h-12 rounded-lg bg-green-500/10 flex items-center justify-center">
+										<Clock className="h-6 w-6 text-green-500" />
+									</div>
+									<div className="flex-1 min-w-0">
+										<p className="text-xs text-muted-foreground">Time</p>
+										<p className="text-sm font-medium">
+											{new Date(eventDate).toLocaleTimeString("en-US", {
+												hour: "2-digit",
+												minute: "2-digit",
+											})}
+										</p>
+									</div>
+								</CardContent>
+							</Card>
 
-              <Card>
-                <CardContent className="p-4 flex items-center gap-3">
-                  <div className="w-12 h-12 rounded-lg bg-purple-500/10 flex items-center justify-center">
-                    <Users className="h-6 w-6 text-purple-500" />
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="text-xs text-muted-foreground">Attendees</p>
-                    <p className="text-sm font-medium">
-                      {bookedCount}/{event.maxParticipants}
-                    </p>
-                  </div>
-                </CardContent>
-              </Card>
+							<Card>
+								<CardContent className="p-4 flex items-center gap-3">
+									<div className="w-12 h-12 rounded-lg bg-purple-500/10 flex items-center justify-center">
+										<Users className="h-6 w-6 text-purple-500" />
+									</div>
+									<div className="flex-1 min-w-0">
+										<p className="text-xs text-muted-foreground">Attendees</p>
+										<p className="text-sm font-medium">
+											{bookedCount}/{event.maxParticipants}
+										</p>
+									</div>
+								</CardContent>
+							</Card>
 
-              <Card>
-                <CardContent className="p-4 flex items-center gap-3">
-                  <div className="w-12 h-12 rounded-lg bg-orange-500/10 flex items-center justify-center">
-                    <DollarSign className="h-6 w-6 text-orange-500" />
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="text-xs text-muted-foreground">Price</p>
-                    <p className="text-sm font-medium">
-                      {event.joiningFee === 0
-                        ? "Free"
-                        : formatCurrency(event.joiningFee)}
-                    </p>
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
+							<Card>
+								<CardContent className="p-4 flex items-center gap-3">
+									<div className="w-12 h-12 rounded-lg bg-orange-500/10 flex items-center justify-center">
+										<DollarSign className="h-6 w-6 text-orange-500" />
+									</div>
+									<div className="flex-1 min-w-0">
+										<p className="text-xs text-muted-foreground">Price</p>
+										<p className="text-sm font-medium">
+											{event.joiningFee === 0
+												? "Free"
+												: formatCurrency(event.joiningFee)}
+										</p>
+									</div>
+								</CardContent>
+							</Card>
+						</div>
 
-            {/* About */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Info className="h-5 w-5 text-primary" />
-                  About This Event
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-muted-foreground whitespace-pre-wrap leading-relaxed">
-                  {event.description}
-                </p>
-              </CardContent>
-            </Card>
+						{/* About */}
+						<Card>
+							<CardHeader>
+								<CardTitle className="flex items-center gap-2">
+									<Info className="h-5 w-5 text-primary" />
+									About This Event
+								</CardTitle>
+							</CardHeader>
+							<CardContent>
+								<p className="text-muted-foreground whitespace-pre-wrap leading-relaxed">
+									{event.description}
+								</p>
+							</CardContent>
+						</Card>
 
-            {/* Details */}
-            <Card>
-              <CardHeader>
-                <CardTitle>Event Details</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="flex items-start gap-4 p-4 bg-muted/50 rounded-lg">
-                  <MapPin className="h-5 w-5 text-primary mt-0.5" />
-                  <div className="flex-1">
-                    <p className="font-medium mb-1">Location</p>
-                    <p className="text-sm text-muted-foreground">
-                      {event.location}
-                    </p>
-                  </div>
-                </div>
+						{/* Details */}
+						<Card>
+							<CardHeader>
+								<CardTitle>Event Details</CardTitle>
+							</CardHeader>
+							<CardContent className="space-y-4">
+								<div className="flex items-start gap-4 p-4 bg-muted/50 rounded-lg">
+									<MapPin className="h-5 w-5 text-primary mt-0.5" />
+									<div className="flex-1">
+										<p className="font-medium mb-1">Location</p>
+										<p className="text-sm text-muted-foreground">
+											{event.location}
+										</p>
+									</div>
+								</div>
 
-                <div className="flex items-start gap-4 p-4 bg-muted/50 rounded-lg">
-                  <Calendar className="h-5 w-5 text-primary mt-0.5" />
-                  <div className="flex-1">
-                    <p className="font-medium mb-1">Date & Time</p>
-                    <p className="text-sm text-muted-foreground">
-                      {formatDateTime(eventDate)}
-                    </p>
-                  </div>
-                </div>
+								<div className="flex items-start gap-4 p-4 bg-muted/50 rounded-lg">
+									<Calendar className="h-5 w-5 text-primary mt-0.5" />
+									<div className="flex-1">
+										<p className="font-medium mb-1">Date & Time</p>
+										<p className="text-sm text-muted-foreground">
+											{formatDateTime(eventDate)}
+										</p>
+									</div>
+								</div>
 
-                <div className="flex items-start gap-4 p-4 bg-muted/50 rounded-lg">
-                  <Users className="h-5 w-5 text-primary mt-0.5" />
-                  <div className="flex-1">
-                    <p className="font-medium mb-1">Participants</p>
-                    <div className="flex items-center gap-2">
-                      <div className="flex-1 bg-background rounded-full h-2">
-                        <div
-                          className="bg-primary h-2 rounded-full transition-all"
-                          style={{
-                            width: `${(bookedCount / event.maxParticipants) * 100}%`,
-                          }}
-                        />
-                      </div>
-                      <span className="text-sm text-muted-foreground whitespace-nowrap">
-                        {bookedCount} / {event.maxParticipants}
-                      </span>
-                    </div>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          </div>
+								<div className="flex items-start gap-4 p-4 bg-muted/50 rounded-lg">
+									<Users className="h-5 w-5 text-primary mt-0.5" />
+									<div className="flex-1">
+										<p className="font-medium mb-1">Participants</p>
+										<div className="flex items-center gap-2">
+											<div className="flex-1 bg-background rounded-full h-2">
+												<div
+													className="bg-primary h-2 rounded-full transition-all"
+													style={{
+														width: `${(bookedCount / event.maxParticipants) * 100}%`,
+													}}
+												/>
+											</div>
+											<span className="text-sm text-muted-foreground whitespace-nowrap">
+												{bookedCount} / {event.maxParticipants}
+											</span>
+										</div>
+									</div>
+								</div>
+							</CardContent>
+						</Card>
+					</div>
 
-          {/* Right */}
-          <div className="lg:col-span-1">
-            <div className="sticky top-4 space-y-4">
-              <Card className="shadow-xl">
-                <CardContent className="p-6 space-y-6">
-                  <div className="text-center p-4 bg-gradient-to-br from-primary/5 to-purple-500/5 rounded-xl">
-                    <p className="text-4xl font-bold text-primary mb-1">
-                      {event.joiningFee === 0
-                        ? "Free"
-                        : formatCurrency(event.joiningFee)}
-                    </p>
-                    <p className="text-sm text-muted-foreground">per person</p>
-                  </div>
+					{/* Right */}
+					<div className="lg:col-span-1">
+						<div className="sticky top-4 space-y-4">
+							<Card className="shadow-xl">
+								<CardContent className="p-6 space-y-6">
+									<div className="text-center p-4 bg-gradient-to-br from-primary/5 to-purple-500/5 rounded-xl">
+										<p className="text-4xl font-bold text-primary mb-1">
+											{event.joiningFee === 0
+												? "Free"
+												: formatCurrency(event.joiningFee)}
+										</p>
+										<p className="text-sm text-muted-foreground">per person</p>
+									</div>
 
-                  <Separator />
+									<Separator />
 
-                  <div className="space-y-3">
-                    <div className="flex justify-between items-center">
-                      <span className="text-sm text-muted-foreground">Status</span>
-                      <Badge variant={isFull ? "destructive" : "default"}>
-                        {isFull ? "Full" : "Available"}
-                      </Badge>
-                    </div>
+									<div className="space-y-3">
+										<div className="flex justify-between items-center">
+											<span className="text-sm text-muted-foreground">
+												Status
+											</span>
+											<Badge variant={isFull ? "destructive" : "default"}>
+												{isFull ? "Full" : "Available"}
+											</Badge>
+										</div>
 
-                    <div className="flex justify-between items-center">
-                      <span className="text-sm text-muted-foreground">Spots Left</span>
-                      <span className="font-semibold text-lg">{spotsLeft}</span>
-                    </div>
-                  </div>
+										<div className="flex justify-between items-center">
+											<span className="text-sm text-muted-foreground">
+												Spots Left
+											</span>
+											<span className="font-semibold text-lg">{spotsLeft}</span>
+										</div>
+									</div>
 
-                  <Separator />
+									<Separator />
 
-                  {isHost ? (
-                    <Link href={`/events/${event.id}/edit`}>
-                      <Button className="w-full h-12 gap-2 shadow-lg" size="lg">
-                        <Edit className="h-5 w-5" />
-                        Edit Event
-                      </Button>
-                    </Link>
-                  ) : hasJoined ? (
-                    <Button className="w-full h-12" disabled size="lg">
-                      <CheckCircle2 className="h-5 w-5 mr-2" />
-                      Already Joined
-                    </Button>
-                  ) : isFull ? (
-                    <Button className="w-full h-12" disabled variant="secondary" size="lg">
-                      <AlertCircle className="h-5 w-5 mr-2" />
-                      Event Full
-                    </Button>
-                  ) : (
-                    <Button
-                      className="w-full h-12 gap-2 shadow-lg hover:shadow-xl transition-all"
-                      disabled={joining}
-                      onClick={handleJoinEvent}
-                      size="lg"
-                    >
-                      {joining ? (
-                        <>
-                          <div className="w-5 h-5 border-2 border-white/20 border-t-white rounded-full animate-spin" />
-                          Joining...
-                        </>
-                      ) : (
-                        <>
-                          <CheckCircle2 className="h-5 w-5" />
-                          Join Event
-                        </>
-                      )}
-                    </Button>
-                  )}
+									{isHost ? (
+										<Link href={`/events/${event.id}/edit`}>
+											<Button className="w-full h-12 gap-2 shadow-lg" size="lg">
+												<Edit className="h-5 w-5" />
+												Edit Event
+											</Button>
+										</Link>
+									) : hasJoined ? (
+										<Button className="w-full h-12" disabled size="lg">
+											<CheckCircle2 className="h-5 w-5 mr-2" />
+											Already Joined
+										</Button>
+									) : isFull ? (
+										<Button
+											className="w-full h-12"
+											disabled
+											variant="secondary"
+											size="lg"
+										>
+											<AlertCircle className="h-5 w-5 mr-2" />
+											Event Full
+										</Button>
+									) : (
+										<Button
+											className="w-full h-12 gap-2 shadow-lg hover:shadow-xl transition-all"
+											disabled={joining}
+											onClick={handleJoinEvent}
+											size="lg"
+										>
+											{joining ? (
+												<>
+													<div className="w-5 h-5 border-2 border-white/20 border-t-white rounded-full animate-spin" />
+													Joining...
+												</>
+											) : (
+												<>
+													<CheckCircle2 className="h-5 w-5" />
+													Join Event
+												</>
+											)}
+										</Button>
+									)}
 
-                  {canReview && <ReviewDialog eventId={event.id} hostId={event.hostId} />}
+									{canReview && !hasReviewed && (
+										<ReviewDialog eventId={event.id} hostId={event.hostId} />
+									)}
 
-                  <div className="pt-4 border-t space-y-2">
-                    <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                      <CheckCircle2 className="h-4 w-4 text-green-500" />
-                      <span>Secure booking</span>
-                    </div>
-                    <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                      <CheckCircle2 className="h-4 w-4 text-green-500" />
-                      <span>Instant confirmation</span>
-                    </div>
-                    <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                      <CheckCircle2 className="h-4 w-4 text-green-500" />
-                      <span>24/7 support</span>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
+									<div className="pt-4 border-t space-y-2">
+										<div className="flex items-center gap-2 text-xs text-muted-foreground">
+											<CheckCircle2 className="h-4 w-4 text-green-500" />
+											<span>Secure booking</span>
+										</div>
+										<div className="flex items-center gap-2 text-xs text-muted-foreground">
+											<CheckCircle2 className="h-4 w-4 text-green-500" />
+											<span>Instant confirmation</span>
+										</div>
+										<div className="flex items-center gap-2 text-xs text-muted-foreground">
+											<CheckCircle2 className="h-4 w-4 text-green-500" />
+											<span>24/7 support</span>
+										</div>
+									</div>
+								</CardContent>
+							</Card>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	);
 }

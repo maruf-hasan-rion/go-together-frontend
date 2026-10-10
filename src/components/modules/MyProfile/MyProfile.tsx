@@ -9,6 +9,7 @@ import { getInitials } from "@/lib/formatters";
 import { updateMyProfile } from "@/services/auth/auth.service";
 import { UserInfo } from "@/types/user.interface";
 import { Camera, Loader2, Save } from "lucide-react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
 
@@ -83,11 +84,18 @@ const MyProfile = ({ userInfo }: MyProfileProps) => {
   return (
     <div className="space-y-6">
       {/* Page Header */}
-      <div>
-        <h1 className="text-3xl font-bold">My Profile</h1>
-        <p className="text-muted-foreground mt-1">
-          Manage your personal information
-        </p>
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-3xl font-bold">My Profile</h1>
+          <p className="text-muted-foreground mt-1">
+            Manage your personal information
+          </p>
+        </div>
+        <Link href="/my-profile/change-password">
+          <Button type="button" variant="outline">
+            Change password
+          </Button>
+        </Link>
       </div>
 
       <form onSubmit={handleSubmit}>
