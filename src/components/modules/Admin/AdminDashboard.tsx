@@ -1,7 +1,5 @@
 "use client";
 
-
-import { getAnalytics } from "@/services/analytics/analytics.service";
 import { StatCard } from "@/components/modules/Analytics/StatCard";
 import {
   Users,
@@ -16,6 +14,7 @@ import {
   FileText,
 } from "lucide-react";
 import { AdminAnalyticsData } from "@/types/meta.interface";
+import AdminCharts from "@/components/modules/Admin/AdminCharts";
 import AdminFeatures from "@/components/modules/Admin/AdminFeatures";
 
 const AdminDashboard = ({ analytics }: { analytics: AdminAnalyticsData }) => {
@@ -84,19 +83,20 @@ const AdminDashboard = ({ analytics }: { analytics: AdminAnalyticsData }) => {
         />
         <StatCard
           title="Total Income"
-          value={`৳${'0'}`}
-          // value={`৳${analytics?.totalPaymentsIncome?.toLocaleString()|| '0'}`}
+          value={`৳${(analytics?.totalPaymentsIncome ?? 0).toLocaleString()}`}
           icon={DollarSign}
           color="bg-gradient-to-br from-emerald-500 to-emerald-600"
         />
         <StatCard
           title="Admin Income"
-          value={`৳${'0'}`}
-          // value={`৳${analytics?.totalAdminIncome?.toLocaleString()|| '0'}`}
+          value={`৳${(analytics?.totalAdminIncome ?? 0).toLocaleString()}`}
           icon={Wallet}
           color="bg-gradient-to-br from-teal-500 to-teal-600"
         />
       </div>
+
+      <AdminCharts analytics={analytics} />
+
       <AdminFeatures></AdminFeatures>
     </div>
   );

@@ -9,13 +9,7 @@ export const metadata: Metadata = {
   description: "Your payment was cancelled. No charge was made — you can try again any time.",
 };
 
-export default async function PaymentCancelPage({
-  searchParams,
-}: {
-  searchParams: Promise<{ bookingId?: string }>;
-}) {
-  const { bookingId } = await searchParams;
-
+export default function PaymentCancelPage() {
   return (
     <div className="flex min-h-[70vh] items-center justify-center px-4 py-16">
       <Card className="w-full max-w-md">
