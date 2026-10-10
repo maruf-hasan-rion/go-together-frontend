@@ -2,7 +2,19 @@
 
 Next.js (App Router) front end for the **Go Together** events & activities platform. Talks to the backend REST API at `NEXT_PUBLIC_BASE_API_URL`.
 
-**Stack:** Next.js 16 (App Router) · React 19 · TypeScript · Tailwind CSS 4 · shadcn/ui · Stripe.js · `@react-oauth/google`.
+**Stack:** Next.js 16 (App Router) · React 19 · TypeScript · Tailwind CSS 4 · shadcn/ui · react-hook-form + Zod · Stripe.js · Zustand.
+
+---
+
+## Demo accounts (one-click login)
+
+The login page has one-click **Demo Login** buttons for each role. All demo users share the password **`Demo@1234`** (created by `pnpm run seed` in the backend repo):
+
+| Role | Email | Password |
+| --- | --- | --- |
+| Admin | `admin@gotogether.dev` | `Demo@1234` |
+| Host | `host@gotogether.dev` | `Demo@1234` |
+| User | `user@gotogether.dev` | `Demo@1234` |
 
 ---
 
