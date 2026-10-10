@@ -293,7 +293,6 @@
 // }
 
 /* eslint-disable react/no-unescaped-entities */
-/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import { useState } from "react";
@@ -328,12 +327,33 @@ import { toast } from "sonner";
 import { joinEvent } from "@/services/events/events";
 import { ReviewDialog } from "../Reviews/ReviewDialog";
 
+type EventDetails = {
+	id: string;
+	title: string;
+	description: string;
+	image?: string | null;
+	eventDate: string;
+	location: string;
+	status: string;
+	maxParticipants: number;
+	joiningFee: number;
+	hostId: string;
+	type: string[] | string;
+	host?: {
+		id?: string;
+		fullName?: string;
+		profilePhoto?: string | null;
+		averageRating?: number | null;
+	} | null;
+	bookings?: { id: string; userId: string; status: string }[];
+};
+
 export default function EventDetailsCard({
 	event,
 	userId,
 	hasReviewed = false,
 }: {
-	event: any;
+	event: EventDetails;
 	userId: string | null;
 	hasReviewed?: boolean;
 }) {
@@ -369,14 +389,14 @@ export default function EventDetailsCard({
 	const eventDate = event.eventDate; // backend: eventDate
 
 	const bookedCount =
-		event?.bookings?.filter((b: any) => b.status === "CONFIRMED").length || 0;
+		event?.bookings?.filter((b) => b.status === "CONFIRMED").length || 0;
 
-	const spotsLeft = event.maxParticipants - bookedCount;
+	const spotsLeft = (event.maxParticipants ?? 0) - bookedCount;
 	const isFull = event.status === "FULL" || spotsLeft <= 0;
 
 	const isHost = userId && userId === event.hostId;
 	const userBooking = userId
-		? event?.bookings?.find((b: any) => b.userId === userId)
+		? event?.bookings?.find((b) => b.userId === userId)
 		: null;
 
 	const hasJoined = !!userBooking;
@@ -393,8 +413,10 @@ export default function EventDetailsCard({
 			} else {
 				toast.error(result?.message || "Failed to join");
 			}
-		} catch (error: any) {
-			toast.error(error?.response?.data?.message || "Something went wrong");
+		} catch (error) {
+			const apiMessage = (error as { response?: { data?: { message?: string } } })?.response?.data
+				?.message;
+			toast.error(apiMessage || (error instanceof Error ? error.message : "Something went wrong"));
 		} finally {
 			setJoining(false);
 		}

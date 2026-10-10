@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 "use server";
 
 import { serverFetch } from "@/lib/server-fetch";
@@ -17,11 +16,11 @@ export async function getRecentEvents() {
 		});
 		const result = await response.json();
 		return result;
-	} catch (error: any) {
+	} catch (error) {
 		console.log(error);
 		return {
 			success: false,
-			message: error.message,
+			message: error instanceof Error ? error.message : "Something went wrong",
 		};
 	}
 }
@@ -37,11 +36,11 @@ export async function getAllEvents(queryString?: string) {
 		);
 		const result = await response.json();
 		return result;
-	} catch (error: any) {
+	} catch (error) {
 		console.log(error);
 		return {
 			success: false,
-			message: error.message,
+			message: error instanceof Error ? error.message : "Something went wrong",
 		};
 	}
 }
@@ -57,11 +56,11 @@ export async function getMyBookedEvents(queryString?: string) {
 		);
 		const result = await response.json();
 		return result;
-	} catch (error: any) {
+	} catch (error) {
 		console.log(error);
 		return {
 			success: false,
-			message: error.message,
+			message: error instanceof Error ? error.message : "Something went wrong",
 		};
 	}
 }
@@ -77,11 +76,11 @@ export async function getMyHostedEvents(queryString?: string) {
 		);
 		const result = await response.json();
 		return result;
-	} catch (error: any) {
+	} catch (error) {
 		console.log(error);
 		return {
 			success: false,
-			message: error.message,
+			message: error instanceof Error ? error.message : "Something went wrong",
 		};
 	}
 }
@@ -94,11 +93,11 @@ export async function getSingleEvent(id: string) {
 		});
 		const result = await response.json();
 		return result;
-	} catch (error: any) {
+	} catch (error) {
 		console.log(error);
 		return {
 			success: false,
-			message: error.message,
+			message: error instanceof Error ? error.message : "Something went wrong",
 		};
 	}
 }
@@ -114,11 +113,11 @@ export async function getEventParticipants(id: string, queryString?: string) {
 		);
 		const result = await response.json();
 		return result;
-	} catch (error: any) {
+	} catch (error) {
 		console.log(error);
 		return {
 			success: false,
-			message: error.message,
+			message: error instanceof Error ? error.message : "Something went wrong",
 		};
 	}
 }
@@ -140,11 +139,11 @@ export async function joinEvent(id: string) {
 			revalidateTag("recent-events", { expire: 0 });
 		}
 		return result;
-	} catch (error: any) {
+	} catch (error) {
 		console.log(error);
 		return {
 			success: false,
-			message: error.message,
+			message: error instanceof Error ? error.message : "Something went wrong",
 		};
 	}
 }
@@ -165,16 +164,16 @@ export async function completeEvent(id: string) {
 			revalidateTag("recent-events", { expire: 0 });
 		}
 		return result;
-	} catch (error: any) {
+	} catch (error) {
 		console.log(error);
 		return {
 			success: false,
-			message: error.message,
+			message: error instanceof Error ? error.message : "Something went wrong",
 		};
 	}
 }
 
-export const createEvent = async (_currentState: any, formData: FormData) => {
+export const createEvent = async (_currentState: unknown, formData: FormData) => {
 	const rawTypes = formData.getAll("type");
 	const types = rawTypes
 		.map((v) => (typeof v === "string" ? v : ""))
@@ -249,9 +248,9 @@ export const createEvent = async (_currentState: any, formData: FormData) => {
 		}
 
 		return result;
-	} catch (error: any) {
-		if (error?.digest?.startsWith("NEXT_REDIRECT")) throw error;
-		return { success: false, message: error.message };
+	} catch (error) {
+		if ((error as { digest?: string })?.digest?.startsWith("NEXT_REDIRECT")) throw error;
+		return { success: false, message: error instanceof Error ? error.message : "Something went wrong" };
 	}
 };
 
@@ -263,8 +262,8 @@ export async function updateEvent(id: string, body: FormData) {
 			cache: "no-store",
 		});
 		return await res.json();
-	} catch (error: any) {
-		return { success: false, message: error.message };
+	} catch (error) {
+		return { success: false, message: error instanceof Error ? error.message : "Something went wrong" };
 	}
 }
 
@@ -287,8 +286,8 @@ export async function deleteEvent(id: string) {
 		}
 
 		return result;
-	} catch (error: any) {
-		return { success: false, message: error.message };
+	} catch (error) {
+		return { success: false, message: error instanceof Error ? error.message : "Something went wrong" };
 	}
 }
 // export const updateEvent = async (

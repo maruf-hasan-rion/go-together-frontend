@@ -1,7 +1,8 @@
 "use client";
 
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import Link from "next/link";
+import type { Event } from "@/types/event.interface";
+import type { Booking } from "@/services/booking/booking";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Plus, Calendar } from "lucide-react";
@@ -10,8 +11,8 @@ import EventCard from "@/components/modules/Events/EventCard";
 type Props = {
   isAuthenticated: boolean;
   userRole: string | null;
-  hostedEvents: any[];
-  bookings: any[];
+  hostedEvents: Event[];
+  bookings: Booking[];
 };
 
 export default function MyEvents({
@@ -85,7 +86,7 @@ export default function MyEvents({
               <TabsContent value="hosted" className="space-y-6">
                 {hostedEvents?.length > 0 ? (
                   <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    {hostedEvents.map((event: any) => (
+                    {hostedEvents.map((event) => (
                       <EventCard key={event.id} event={event} />
                     ))}
                   </div>
@@ -109,10 +110,10 @@ export default function MyEvents({
             <TabsContent value="joined" className="space-y-6">
               {bookings?.length > 0 ? (
                 <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-                  {bookings.map((booking: any) => (
+                  {bookings.map((booking) => (
                     <EventCard
                       key={booking.id}
-                      event={booking.event ?? booking}
+                      event={(booking.event ?? booking) as Event}
                     />
                   ))}
                 </div>

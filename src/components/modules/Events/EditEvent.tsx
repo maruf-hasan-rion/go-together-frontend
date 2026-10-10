@@ -1,9 +1,10 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
-import { useForm } from "react-hook-form";
+import { useForm, type Resolver } from "react-hook-form";
+import type { Event } from "@/types/event.interface";
+import type { UserInfo } from "@/types/user.interface";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import Image from "next/image";
@@ -97,8 +98,8 @@ const editEventSchema = z.object({
 type EditEventValues = z.infer<typeof editEventSchema>;
 
 type Props = {
-  event: any;
-  user: any;
+  event: Event;
+  user: UserInfo;
 };
 
 function toDatetimeLocalUTC(iso?: string) {
@@ -129,7 +130,7 @@ export default function EditEvent({ event, user }: Props) {
   }, [user, event]);
 
   const form = useForm<EditEventValues>({
-    resolver: zodResolver(editEventSchema) as any,
+    resolver: zodResolver(editEventSchema) as unknown as Resolver<EditEventValues>,
     defaultValues: {
       title: "",
       location: "",
@@ -157,7 +158,7 @@ export default function EditEvent({ event, user }: Props) {
       joiningFee: event.joiningFee ?? 0,
       description: event.description ?? "",
       type: Array.isArray(event.type) ? event.type : [],
-      status: event.status ?? "OPEN",
+      status: (event.status ?? "OPEN") as EditEventValues["status"],
     });
 
     setHasChanges(false);
@@ -224,7 +225,7 @@ export default function EditEvent({ event, user }: Props) {
       joiningFee: event.joiningFee ?? 0,
       description: event.description ?? "",
       type: Array.isArray(event.type) ? event.type : [],
-      status: event.status ?? "OPEN",
+      status: (event.status ?? "OPEN") as EditEventValues["status"],
     };
 
     const changed =
@@ -255,8 +256,8 @@ export default function EditEvent({ event, user }: Props) {
       } else {
         toast.error(result?.message || "Failed to update event");
       }
-    } catch (err: any) {
-      toast.error(err?.message || "Something went wrong");
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Something went wrong");
     } finally {
       setIsSaving(false);
     }
@@ -280,8 +281,8 @@ const handleDelete = async () => {
     } else {
       toast.error(result?.message || "Failed to delete event");
     }
-  } catch (error: any) {
-    toast.error(error?.message || "Failed to delete event");
+  } catch (error) {
+    toast.error(error instanceof Error ? error.message : "Failed to delete event");
   } finally {
     setIsDeleting(false);
   }

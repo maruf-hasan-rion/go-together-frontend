@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 "use server";
 
 import { getDefaultDashboardRoute, UserRole } from "@/lib/auth-utils";
@@ -35,14 +34,16 @@ export const googleSignIn = async (idToken: string) => {
     const role = (decoded?.payload.role as UserRole) || "USER";
 
     redirect(`${getDefaultDashboardRoute(role)}?loggedIn=true`);
-  } catch (error: any) {
-    if (error?.digest?.startsWith("NEXT_REDIRECT")) throw error;
+  } catch (error) {
+    if ((error as { digest?: string })?.digest?.startsWith("NEXT_REDIRECT")) throw error;
 
     return {
       success: false,
       message:
         process.env.NODE_ENV === "development"
-          ? error.message
+          ? error instanceof Error
+            ? error.message
+            : "Google sign-in failed"
           : "Google sign-in failed. Please try again.",
     };
   }

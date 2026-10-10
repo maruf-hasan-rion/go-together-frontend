@@ -1,6 +1,5 @@
 
 "use server"
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { revalidateTag } from "next/cache";
 
 export async function revalidateAllData() {

@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 "use server";
 
 import { serverFetch } from "@/lib/server-fetch";
@@ -9,12 +8,29 @@ import {
   resetPasswordZodSchema,
 } from "@/zod/auth.validation";
 
-export const forgotPassword = async (_prevState: any, formData: FormData): Promise<any> => {
+type AuthActionResult = {
+  success: boolean;
+  message?: string;
+  errors?: { field: string; message: string }[];
+  redirectToLogin?: boolean;
+};
+
+export const forgotPassword = async (
+  _prevState: unknown,
+  formData: FormData,
+): Promise<AuthActionResult> => {
   const payload = { email: formData.get("email") };
 
   const validated = zodValidator(payload, forgotPasswordZodSchema);
   if (!validated.success) {
-    return { ...validated, formData: payload };
+    return {
+      success: false,
+      message: "Please check the form",
+      errors: (validated.errors ?? []).map((error) => ({
+        field: String(error.field),
+        message: error.message,
+      })),
+    };
   }
 
   try {
@@ -32,18 +48,23 @@ export const forgotPassword = async (_prevState: any, formData: FormData): Promi
         result?.message ||
         "If the account exists, a password reset link has been sent.",
     };
-  } catch (error: any) {
+  } catch (error) {
     return {
       success: false,
       message:
         process.env.NODE_ENV === "development"
-          ? error.message
+          ? error instanceof Error
+            ? error.message
+            : "Something went wrong"
           : "Something went wrong. Please try again.",
     };
   }
 };
 
-export const changePassword = async (_prevState: any, formData: FormData): Promise<any> => {
+export const changePassword = async (
+  _prevState: unknown,
+  formData: FormData,
+): Promise<AuthActionResult> => {
   const payload = {
     oldPassword: formData.get("oldPassword"),
     newPassword: formData.get("newPassword"),
@@ -52,7 +73,14 @@ export const changePassword = async (_prevState: any, formData: FormData): Promi
 
   const validated = zodValidator(payload, changePasswordZodSchema);
   if (!validated.success) {
-    return { ...validated, formData: payload };
+    return {
+      success: false,
+      message: "Please check the form",
+      errors: (validated.errors ?? []).map((error) => ({
+        field: String(error.field),
+        message: error.message,
+      })),
+    };
   }
 
   try {
@@ -72,18 +100,23 @@ export const changePassword = async (_prevState: any, formData: FormData): Promi
       message: result?.message || "Password changed successfully.",
       redirectToLogin: Boolean(result?.success),
     };
-  } catch (error: any) {
+  } catch (error) {
     return {
       success: false,
       message:
         process.env.NODE_ENV === "development"
-          ? error.message
+          ? error instanceof Error
+            ? error.message
+            : "Something went wrong"
           : "Something went wrong. Please try again.",
     };
   }
 };
 
-export const resetPassword = async (_prevState: any, formData: FormData): Promise<any> => {
+export const resetPassword = async (
+  _prevState: unknown,
+  formData: FormData,
+): Promise<AuthActionResult> => {
   const payload = {
     token: formData.get("token"),
     newPassword: formData.get("newPassword"),
@@ -92,7 +125,14 @@ export const resetPassword = async (_prevState: any, formData: FormData): Promis
 
   const validated = zodValidator(payload, resetPasswordZodSchema);
   if (!validated.success) {
-    return { ...validated, formData: payload };
+    return {
+      success: false,
+      message: "Please check the form",
+      errors: (validated.errors ?? []).map((error) => ({
+        field: String(error.field),
+        message: error.message,
+      })),
+    };
   }
 
   try {
@@ -111,12 +151,14 @@ export const resetPassword = async (_prevState: any, formData: FormData): Promis
       success: Boolean(result?.success),
       message: result?.message || "Password reset successfully.",
     };
-  } catch (error: any) {
+  } catch (error) {
     return {
       success: false,
       message:
         process.env.NODE_ENV === "development"
-          ? error.message
+          ? error instanceof Error
+            ? error.message
+            : "Something went wrong"
           : "Something went wrong. Please try again.",
     };
   }

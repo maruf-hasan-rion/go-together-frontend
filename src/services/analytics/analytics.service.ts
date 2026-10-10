@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 "use server";
 
 import { serverFetch } from "@/lib/server-fetch";
@@ -15,10 +14,10 @@ export async function getAnalytics() {
     const result = await response.json();
     console.log("Analytics Data:", result);
     return result;
-  } catch (error: any) {
+  } catch (error) {
     return {
       success: false,
-      message: error.message,
+      message: error instanceof Error ? error.message : "Failed to load analytics",
     };
   }
 }
