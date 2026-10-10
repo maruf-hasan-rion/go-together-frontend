@@ -29,11 +29,17 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import { PaymentDialog } from "@/components/payment/PaymentDialog";
+import dynamic from "next/dynamic";
 import {
   Booking,
   cancelBooking as cancelBookingService,
 } from "@/services/booking/booking";
+
+// Stripe + Elements are heavy; load the payment dialog only when needed.
+const PaymentDialog = dynamic(
+  () => import("@/components/payment/PaymentDialog").then((m) => m.PaymentDialog),
+  { ssr: false, loading: () => null },
+);
 import { ReviewDialog } from "../Reviews/ReviewDialog";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
