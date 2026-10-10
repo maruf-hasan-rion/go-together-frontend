@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { Calendar as CalendarIcon } from "lucide-react";
 import Link from "next/link";
 
@@ -6,38 +5,25 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { BookingCard } from "@/components/modules/Booking/BookingCard";
 import { unwrapList } from "@/lib/unwrap";
-import { getMyBookings } from "@/services/booking/booking";
-
-//  function normalizeBookings(result: any) {
-//   const d = result?.data;
-
-//   if (Array.isArray(d)) return d;
-//   if (Array.isArray(d?.bookings)) return d.bookings;
-//   if (Array.isArray(d?.data)) return d.data;
-//   if (Array.isArray(result)) return result;
-
-//   return [];
-// }
+import { getMyBookings, type Booking } from "@/services/booking/booking";
 
 export default async function MyBookingsPage() {
 	const res = await getMyBookings();
-	const bookings = unwrapList(res, "result");
+	const bookings = unwrapList<Booking>(res, "result");
 
 	const upcomingBookings = bookings.filter(
-		(b: any) =>
+		(b) =>
 			(b.status === "CONFIRMED" || b.status === "PENDING") &&
-			new Date(b.event?.eventDate) > new Date(),
+			new Date(b.event?.eventDate ?? "") > new Date(),
 	);
 
 	const pastBookings = bookings.filter(
-		(b: any) =>
+		(b) =>
 			(b.status === "CONFIRMED" || b.status === "COMPLETED") &&
-			new Date(b.event?.eventDate) <= new Date(),
+			new Date(b.event?.eventDate ?? "") <= new Date(),
 	);
 
-	const cancelledBookings = bookings.filter(
-		(b: any) => b.status === "CANCELLED",
-	);
+	const cancelledBookings = bookings.filter((b) => b.status === "CANCELLED");
 
 	return (
 		<div className="min-h-screen flex flex-col">
@@ -67,7 +53,7 @@ export default async function MyBookingsPage() {
 
 						<TabsContent value="upcoming" className="space-y-4">
 							{upcomingBookings.length > 0 ? (
-								upcomingBookings.map((booking: any) => (
+								upcomingBookings.map((booking) => (
 									<BookingCard key={booking.id} booking={booking} />
 								))
 							) : (
@@ -86,7 +72,7 @@ export default async function MyBookingsPage() {
 
 						<TabsContent value="past" className="space-y-4">
 							{pastBookings.length > 0 ? (
-								pastBookings.map((booking: any) => (
+								pastBookings.map((booking) => (
 									<BookingCard key={booking.id} booking={booking} />
 								))
 							) : (
@@ -100,7 +86,7 @@ export default async function MyBookingsPage() {
 
 						<TabsContent value="cancelled" className="space-y-4">
 							{cancelledBookings.length > 0 ? (
-								cancelledBookings.map((booking: any) => (
+								cancelledBookings.map((booking) => (
 									<BookingCard key={booking.id} booking={booking} />
 								))
 							) : (

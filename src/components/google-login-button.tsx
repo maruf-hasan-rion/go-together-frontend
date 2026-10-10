@@ -5,10 +5,21 @@ import Script from "next/script";
 import { useRef, useState } from "react";
 import { toast } from "sonner";
 
-/* eslint-disable @typescript-eslint/no-explicit-any */
+type GoogleIdentity = {
+  accounts: {
+    id: {
+      initialize: (config: {
+        client_id: string;
+        callback: (response: { credential?: string }) => void;
+      }) => void;
+      renderButton: (parent: HTMLElement, options: Record<string, unknown>) => void;
+    };
+  };
+};
+
 declare global {
   interface Window {
-    google?: any;
+    google?: GoogleIdentity;
   }
 }
 

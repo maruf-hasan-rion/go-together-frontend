@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import { useOptimistic, useState, useTransition } from "react";
@@ -117,8 +116,8 @@ export function BookingCard({ booking }: BookingCardProps) {
 
         toast.success("Booking cancelled successfully!");
         router.refresh();
-      } catch (error: any) {
-        toast.error(error?.message || "Something went wrong");
+      } catch (error) {
+        toast.error(error instanceof Error ? error.message : "Something went wrong");
       } finally {
         setIsCancelling(false);
       }
@@ -168,7 +167,7 @@ export function BookingCard({ booking }: BookingCardProps) {
                     </h3>
                   </Link>
                   <p className="text-sm text-muted-foreground line-clamp-2">
-                    {(event as any)?.description}
+                    {(event as { description?: string })?.description}
                   </p>
                 </div>
 
