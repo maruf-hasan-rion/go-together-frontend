@@ -8,7 +8,7 @@ interface DateFilterProps {
     paramName?: string;
 }
 
-const DateFilter = ({ placeholder = "Date", paramName = "date" }: DateFilterProps) => {
+const DateFilter = ({ paramName = "date" }: DateFilterProps) => {
     const router = useRouter();
     const [, startTransition] = useTransition();
     const searchParams = useSearchParams();

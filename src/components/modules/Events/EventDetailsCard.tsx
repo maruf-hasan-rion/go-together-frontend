@@ -302,7 +302,6 @@ import Link from "next/link";
 
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 
@@ -311,7 +310,6 @@ import {
 	MapPin,
 	Users,
 	DollarSign,
-	Star,
 	ArrowLeft,
 	Clock,
 	CheckCircle2,
@@ -322,7 +320,7 @@ import {
 	Info,
 } from "lucide-react";
 
-import { formatDateTime, formatCurrency, getInitials } from "@/lib/utils";
+import { formatDateTime, formatCurrency } from "@/lib/utils";
 import { toast } from "sonner";
 import { joinEvent } from "@/services/events/events";
 import { ReviewDialog } from "../Reviews/ReviewDialog";
