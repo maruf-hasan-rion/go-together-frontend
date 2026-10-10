@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 "use server";
 
 import { z } from "zod";
@@ -65,7 +64,7 @@ const createHostApplicationSchema = z.object({
 //     };
 //   }
 // };
-export const createHostApplication = async (_: any, formData: FormData) => {
+export const createHostApplication = async (_: unknown, formData: FormData) => {
   const payload = { message: formData.get("message") };
 
   const validated = zodValidator(payload, createHostApplicationSchema);
@@ -91,10 +90,10 @@ export const createHostApplication = async (_: any, formData: FormData) => {
       : { success: false, message: "Empty response from server" };
 
     return result;
-  } catch (error: any) {
+  } catch (error) {
     return {
       success: false,
-      message: error?.message || "Something went wrong",
+      message: error instanceof Error ? error.message : "Something went wrong",
     };
   }
 };

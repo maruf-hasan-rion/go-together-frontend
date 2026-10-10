@@ -24,7 +24,7 @@ export async function revalidateAllData() {
         revalidateTag('user-payments', { expire: 0 });
 
         return { success: true };
-    } catch (error: any) {
+    } catch (error) {
         console.log(error);
         return { success: false };
     }

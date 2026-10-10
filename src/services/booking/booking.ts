@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 "use server";
 
 import { serverFetch } from "@/lib/server-fetch";
@@ -37,9 +36,9 @@ export async function getMyBookings() {
 
     const result = await response.json();
     return result;
-  } catch (error: any) {
+  } catch (error) {
     console.log(error);
-    return { success: false, message: error.message };
+    return { success: false, message: error instanceof Error ? error.message : "Something went wrong" };
   }
 }
 
@@ -67,9 +66,9 @@ export async function createBooking(eventId: string) {
     }
 
     return result;
-  } catch (error: any) {
+  } catch (error) {
     console.log(error);
-    return { success: false, message: error.message };
+    return { success: false, message: error instanceof Error ? error.message : "Something went wrong" };
   }
 }
 
@@ -93,8 +92,8 @@ export async function cancelBooking(bookingId: string) {
     }
 
     return result;
-  } catch (error: any) {
+  } catch (error) {
     console.log(error);
-    return { success: false, message: error.message };
+    return { success: false, message: error instanceof Error ? error.message : "Something went wrong" };
   }
 }
