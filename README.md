@@ -1,87 +1,58 @@
-# Go Together – Frontend
+# Go Together — Frontend
 
-Frontend application for the **Go Together** event management platform.  
-Built with Next.js App Router, focused on event discovery, hosting, and booking.
+Next.js (App Router) front end for the **Go Together** events & activities platform. Talks to the backend REST API at `NEXT_PUBLIC_BASE_API_URL`.
 
----
-
-## 🚀 Tech Stack
-
-- Next.js (App Router)
-- TypeScript
-- Tailwind CSS
-- shadcn/ui
-- Zod (validation)
-- Server Actions + `serverFetch`
-- Sonner (toast notifications)
+**Stack:** Next.js 16 (App Router) · React 19 · TypeScript · Tailwind CSS 4 · shadcn/ui · Stripe.js · `@react-oauth/google`.
 
 ---
 
-## ✨ Features
+## Getting started
 
-- Browse all events
-- View event details
-- Create / update / delete events (Host/Admin)
-- Join events (Users)
-- Event image upload
-- Category-based events
-- UI cache revalidation after create/update/delete
+```bash
+npm install
+cp .env.example .env    # fill in the values below
+npm run dev             # http://localhost:3000
+```
 
 ---
 
-## 📦 Requirements
+## Environment variables
 
-- Node.js >= 18
-- pnpm / npm / yarn
+| Variable | Purpose |
+| --- | --- |
+| `NEXT_PUBLIC_BASE_API_URL` | Backend API base, including `/api/v1` (e.g. `http://localhost:5000/api/v1`) |
+| `NEXT_PUBLIC_API_URL` | Backend origin, used to build absolute URLs for legacy `/uploads` images |
+| `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY` | Enables the payment dialog (`pk_test_...`) |
+| `NEXT_PUBLIC_GOOGLE_CLIENT_ID` | Enables the "Continue with Google" button (must match the backend) |
 
 ---
 
-## ⚙️ Setup
+## Scripts
 
-### 1️⃣ Install dependencies
+| Command | What it does |
+| --- | --- |
+| `npm run dev` | Start the dev server |
+| `npm run build` | Production build |
+| `npm run start` | Serve the production build |
+| `npm run lint` | `biome check` |
+| `npm run format` | `biome format --write` |
 
-pnpm install
+---
 
-### 2️⃣ Environment variables
+## Structure
 
-Create .env.local:
-
-NEXT_PUBLIC_API_URL = http://localhost:5000/api/v1
-
-### 3️⃣ Run development server
-
-pnpm dev
-
-App runs on:
-
-http://localhost:3000
-
-### 🗂️ Project Structure
-
+```
 src/
-├─ app/  
- ├─ components/  
- ├─ services/  
- ├─ lib/  
- ├─ types/
+├─ app/                 # App Router: (commonLayout) public pages, (dashboardLayout) dashboards
+├─ components/          # ui/ (shadcn) + modules/ (feature components) + shared/
+├─ services/            # server actions — one folder per domain (auth, events, booking, reviews, admin, user…)
+├─ lib/                 # server-fetch (attaches the accessToken cookie + proactive refresh), utils, formatters
+├─ zod/                 # client-side Zod schemas
+└─ proxy.ts             # middleware: token refresh + role-based route guard
+```
 
-### 🔄 Caching & Revalidation
+**Data flow:** pages/components call **server actions** in `src/services/*`, which use `serverFetch` from `src/lib/server-fetch.ts`. `serverFetch` reads the `accessToken` cookie, calls `/auth/refresh-token` when needed, and forwards the cookie to the API. `src/proxy.ts` guards routes by role and refreshes tokens on navigation.
 
-Uses Next.js cache tags:
+**Response shape:** every API response is `{ success, message, meta, data }`; list endpoints put `meta` (`page/limit/total`) at the top level and `data` is an array of records.
 
-- all-events
-- my-hosted-events
-- single-event
-
-#### After create/update/delete:
-
-revalidateTag("all-events");
-
-revalidateTag("my-hosted-events");
-
-revalidateTag("single-event");
-
-### 🏗️ Build
-
-pnpm build
-pnpm start
+**Caching:** server actions revalidate Next cache tags (`all-events`, `single-event`, `my-hosted-events`, `user-bookings`, …) after mutations.
