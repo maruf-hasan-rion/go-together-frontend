@@ -331,7 +331,7 @@ export default function CreateEventWizard() {
                   </div>
                   <div className="sm:col-span-2">
                     <span className="font-medium text-foreground">Categories:</span>{" "}
-                    {values.type.join(", ") || "—"}
+                    {(values.type ?? []).join(", ") || "—"}
                   </div>
                 </dl>
               </div>
