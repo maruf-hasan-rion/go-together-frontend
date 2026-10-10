@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
-import { useState } from "react";
+import { useOptimistic, useState, useTransition } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { Card, CardContent } from "@/components/ui/card";
@@ -53,12 +53,19 @@ export function BookingCard({ booking }: BookingCardProps) {
 
   const [showPaymentDialog, setShowPaymentDialog] = useState(false);
   const [isCancelling, setIsCancelling] = useState(false);
+  const [, startTransition] = useTransition();
+
+  // Reflect the cancellation immediately, before the server round-trip.
+  const [optimisticStatus, setOptimisticStatus] = useOptimistic(
+    booking.status,
+    (_current: Booking["status"], next: Booking["status"]) => next,
+  );
 
   const event = booking.event!;
   const isPast = new Date(event.eventDate) < new Date();
-  const isCompleted = booking.status === "COMPLETED";
-  const canCancel = booking.status === "CONFIRMED" && !isPast;
-  const needsPayment = booking.status === "PENDING";
+  const isCompleted = optimisticStatus === "COMPLETED";
+  const canCancel = optimisticStatus === "CONFIRMED" && !isPast;
+  const needsPayment = optimisticStatus === "PENDING";
 
   const statusConfig = {
     CONFIRMED: {
@@ -92,27 +99,30 @@ export function BookingCard({ booking }: BookingCardProps) {
   };
 
   const status =
-    statusConfig[booking.status as keyof typeof statusConfig] ||
+    statusConfig[optimisticStatus as keyof typeof statusConfig] ||
     statusConfig.CONFIRMED;
   const StatusIcon = status.icon;
 
-  const handleCancel = async () => {
-    setIsCancelling(true);
-    try {
-      const result = await cancelBookingService(booking.id);
+  const handleCancel = () => {
+    startTransition(async () => {
+      setOptimisticStatus("CANCELLED");
+      setIsCancelling(true);
+      try {
+        const result = await cancelBookingService(booking.id);
 
-      if (!result?.success) {
-        toast.error(result?.message || "Failed to cancel booking");
-        return;
+        if (!result?.success) {
+          toast.error(result?.message || "Failed to cancel booking");
+          return;
+        }
+
+        toast.success("Booking cancelled successfully!");
+        router.refresh();
+      } catch (error: any) {
+        toast.error(error?.message || "Something went wrong");
+      } finally {
+        setIsCancelling(false);
       }
-
-      toast.success("Booking cancelled successfully!");
-      router.refresh();
-    } catch (error: any) {
-      toast.error(error?.message || "Something went wrong");
-    } finally {
-      setIsCancelling(false);
-    }
+    });
   };
 
   return (
