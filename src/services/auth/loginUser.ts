@@ -1,10 +1,9 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 "use server";
 
 import {
   getDefaultDashboardRoute,
   isValidRedirectForRole,
-  UserRole,
+  type UserRole,
 } from "@/lib/auth-utils";
 import { parse } from "cookie";
 import { redirect } from "next/navigation";
@@ -13,93 +12,72 @@ import { setCookie } from "./tokenHandlers";
 import { loginValidationZodSchema } from "@/zod/auth.validation";
 import { zodValidator } from "@/lib/zodValidator";
 import { serverFetch } from "@/lib/server-fetch";
+import type { ActionState } from "@/types/action";
 
 export const loginUser = async (
-  _currentState: any,
-  formData: any
-): Promise<any> => {
+  _currentState: unknown,
+  formData: FormData,
+): Promise<ActionState> => {
   try {
-    const redirectTo = formData.get("redirect") || null;
-    let accessTokenObject: null | any = null;
-    let refreshTokenObject: null | any = null;
+    const redirectTo = formData.get("redirect");
     const payload = {
       email: formData.get("email"),
       password: formData.get("password"),
     };
 
-    if (zodValidator(payload, loginValidationZodSchema).success === false) {
-      return zodValidator(payload, loginValidationZodSchema);
-    }
-
-    const validatedPayload = zodValidator(
-      payload,
-      loginValidationZodSchema
-    ).data;
+    const validation = zodValidator(payload, loginValidationZodSchema);
+    if (!validation.success) return validation;
 
     const res = await serverFetch.post("/auth/login", {
-      body: JSON.stringify(validatedPayload),
-      headers: {
-        "Content-Type": "application/json",
-      },
+      body: JSON.stringify(validation.data),
+      headers: { "Content-Type": "application/json" },
     });
 
     const result = await res.json();
-
     const setCookieHeaders = res.headers.getSetCookie();
 
-    if (setCookieHeaders && setCookieHeaders.length > 0) {
-      setCookieHeaders.forEach((cookie: string) => {
-        const parsedCookie = parse(cookie);
+    let accessTokenObject: Record<string, string> | null = null;
+    let refreshTokenObject: Record<string, string> | null = null;
 
-        if (parsedCookie["accessToken"]) {
-          accessTokenObject = parsedCookie;
-        }
-        if (parsedCookie["refreshToken"]) {
-          refreshTokenObject = parsedCookie;
-        }
-      });
-    } else {
-      throw new Error("No Set-Cookie header found");
+    for (const cookie of setCookieHeaders ?? []) {
+      const parsedCookie = parse(cookie) as Record<string, string>;
+      if (parsedCookie.accessToken) accessTokenObject = parsedCookie;
+      if (parsedCookie.refreshToken) refreshTokenObject = parsedCookie;
     }
 
-    if (!accessTokenObject) {
+    if (!accessTokenObject || !refreshTokenObject) {
       throw new Error("Tokens not found in cookies");
     }
 
-    if (!refreshTokenObject) {
-      throw new Error("Tokens not found in cookies");
-    }
-
-    await setCookie("accessToken", accessTokenObject.accessToken, {
+    const cookieOptions = {
       secure: true,
       httpOnly: true,
+      sameSite: "none" as const,
+      path: "/" as const,
+    };
+
+    await setCookie("accessToken", accessTokenObject.accessToken, {
+      ...cookieOptions,
       maxAge: parseInt(accessTokenObject["Max-Age"]) || 1000 * 60 * 60,
-      path: accessTokenObject.Path || "/",
-      sameSite: accessTokenObject["SameSite"] || "none",
     });
 
     await setCookie("refreshToken", refreshTokenObject.refreshToken, {
-      secure: true,
-      httpOnly: true,
-      maxAge:
-        parseInt(refreshTokenObject["Max-Age"]) || 1000 * 60 * 60 * 24 * 90,
-      path: refreshTokenObject.Path || "/",
-      sameSite: refreshTokenObject["SameSite"] || "none",
+      ...cookieOptions,
+      maxAge: parseInt(refreshTokenObject["Max-Age"]) || 1000 * 60 * 60 * 24 * 90,
     });
-    const decoded = decodeJwt(accessTokenObject.accessToken);
 
+    const decoded = decodeJwt(accessTokenObject.accessToken);
     if (!decoded || decoded.expired || !decoded.payload.role) {
       throw new Error("Invalid token");
     }
-
-    const userRole: UserRole = decoded.payload.role as UserRole;
+    const userRole = decoded.payload.role as UserRole;
 
     if (!result.success) {
       throw new Error(result.message || "Login failed");
     }
 
     if (redirectTo) {
-      const requestedPath = redirectTo.toString();
+      const requestedPath = String(redirectTo);
       if (isValidRedirectForRole(requestedPath, userRole)) {
         redirect(`${requestedPath}?loggedIn=true`);
       } else {
@@ -108,19 +86,20 @@ export const loginUser = async (
     } else {
       redirect(`${getDefaultDashboardRoute(userRole)}?loggedIn=true`);
     }
-  } catch (error: any) {
+  } catch (error) {
     // Re-throw NEXT_REDIRECT errors so Next.js can handle them
-    if (error?.digest?.startsWith("NEXT_REDIRECT")) {
+    if ((error as { digest?: string })?.digest?.startsWith("NEXT_REDIRECT")) {
       throw error;
     }
     console.log(error);
     return {
       success: false,
-      message: `${
+      message:
         process.env.NODE_ENV === "development"
-          ? error.message
-          : "Login Failed. You might have entered incorrect email or password."
-      }`,
+          ? error instanceof Error
+            ? error.message
+            : "Login Failed"
+          : "Login Failed. You might have entered incorrect email or password.",
     };
   }
 };

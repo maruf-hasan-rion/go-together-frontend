@@ -1,17 +1,16 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 "use server";
 
 import { loginUser } from "./loginUser";
 import { registerValidationZodSchema } from "@/zod/auth.validation";
 import { zodValidator } from "@/lib/zodValidator";
 import { serverFetch } from "@/lib/server-fetch";
+import type { ActionState } from "@/types/action";
 
 export const registerUser = async (
-  _currentState: any,
-  formData: any
-): Promise<any> => {
+  _currentState: unknown,
+  formData: FormData,
+): Promise<ActionState> => {
   try {
-    console.log(formData.get("fullName"));
     const payload = {
       fullName: formData.get("fullName"),
       email: formData.get("email"),
@@ -19,14 +18,14 @@ export const registerUser = async (
       confirmPassword: formData.get("confirmPassword"),
     };
 
-    if (zodValidator(payload, registerValidationZodSchema).success === false) {
-      return zodValidator(payload, registerValidationZodSchema);
-    }
+    const validation = zodValidator(payload, registerValidationZodSchema);
+    if (!validation.success) return validation;
 
-    const validatedPayload: any = zodValidator(
-      payload,
-      registerValidationZodSchema
-    ).data;
+    const validatedPayload = validation.data as {
+      fullName: string;
+      email: string;
+      password: string;
+    };
 
     const registerData = {
       fullName: validatedPayload.fullName,
@@ -35,7 +34,6 @@ export const registerUser = async (
     };
 
     const newFormData = new FormData();
-
     newFormData.append("data", JSON.stringify(registerData));
 
     const res = await serverFetch.post("/user/create-user", {
@@ -48,19 +46,20 @@ export const registerUser = async (
     }
 
     return result;
-  } catch (error: any) {
+  } catch (error) {
     // Re-throw NEXT_REDIRECT errors so Next.js can handle them
-    if (error?.digest?.startsWith("NEXT_REDIRECT")) {
+    if ((error as { digest?: string })?.digest?.startsWith("NEXT_REDIRECT")) {
       throw error;
     }
     console.log(error);
     return {
       success: false,
-      message: `${
+      message:
         process.env.NODE_ENV === "development"
-          ? error.message
-          : "Registration Failed. Please try again."
-      }`,
+          ? error instanceof Error
+            ? error.message
+            : "Registration Failed"
+          : "Registration Failed. Please try again.",
     };
   }
 };

@@ -8,7 +8,7 @@ export const zodValidator = <T>(payload: T, schema: ZodObject) => {
             success: false,
             errors: validatedPayload.error.issues.map(issue => {
                 return {
-                    field: issue.path[0],
+                    field: String(issue.path[0] ?? ""),
                     message: issue.message,
                 }
             })
