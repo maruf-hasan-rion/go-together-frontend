@@ -10,19 +10,12 @@ import { hostsColumns } from "./HostColumns";
 
 interface IHostData {
     id: string;
+    fullName: string;
     email: string;
-    status: string;
-    host: {
-        id: string;
-        name: string;
-        email: string;
-        profilePhoto?: string;
-        contactNumber?: string;
-        location?: string;
-        income?: number;
-        rating?: number;
-        ratingCount?: number;
-    };
+    status?: string;
+    location?: string | null;
+    averageRating?: number | null;
+    totalReviews?: number | null;
 }
 
 interface HostManagementTableProps {
@@ -84,7 +77,7 @@ const HostManagementTable = ({ hosts }: HostManagementTableProps) => {
             header: "Actions",
             accessor: (row: IHostData) => (
                 <div className="flex gap-2">
-                    {row.status === "SUSPENDED" ? (
+                    {row.status === "BLOCKED" ? (
                         <Button
                             size="sm"
                             variant="outline"
