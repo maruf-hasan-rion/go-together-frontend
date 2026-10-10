@@ -1,90 +1,122 @@
 "use client";
 
-import { useActionState, useEffect } from "react";
-import { Button } from "./ui/button";
-import { Field, FieldDescription, FieldGroup, FieldLabel } from "./ui/field";
-import { Input } from "./ui/input";
-import { registerUser } from "@/services/auth/registerUser";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+import type { z } from "zod";
 import { toast } from "sonner";
 import Link from "next/link";
-import InputFieldError from "./shared/InputFieldError";
+
+import { Button } from "./ui/button";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "./ui/form";
+import { Input } from "./ui/input";
+import { registerUser } from "@/services/auth/registerUser";
+import { registerValidationZodSchema } from "@/zod/auth.validation";
+
+type RegisterFormValues = z.infer<typeof registerValidationZodSchema>;
 
 const RegisterForm = () => {
-  const [state, formAction, isPending] = useActionState(registerUser, null);
+  const form = useForm<RegisterFormValues>({
+    resolver: zodResolver(registerValidationZodSchema),
+    defaultValues: { fullName: "", email: "", password: "", confirmPassword: "" },
+  });
 
-  useEffect(() => {
-    if (state && !state.success && state.message) {
-      toast.error(state.message);
+  const onSubmit = async (values: RegisterFormValues) => {
+    const formData = new FormData();
+    formData.set("fullName", values.fullName);
+    formData.set("email", values.email);
+    formData.set("password", values.password);
+    formData.set("confirmPassword", values.confirmPassword);
+
+    const result = await registerUser(null, formData);
+
+    if (result && !result.success) {
+      for (const error of result.errors ?? []) {
+        form.setError(error.field as keyof RegisterFormValues, {
+          message: error.message,
+        });
+      }
+      if (result.message) toast.error(result.message);
     }
-  }, [state]);
+  };
 
   return (
-    <form action={formAction}>
-      <FieldGroup>
-        <div className="grid grid-cols-1 gap-4">
-          {/* FullName */}
-          <Field className="md:col-span-2">
-            <FieldLabel htmlFor="fullName">Full Name</FieldLabel>
-            <Input
-              id="fullName"
-              name="fullName"
-              type="text"
-              placeholder="John Doe"
-            />
-            <InputFieldError  field="fullName" state={state} />
-          </Field>
-          {/* Email */}
-          <Field className="md:col-span-2">
-            <FieldLabel htmlFor="email">Email</FieldLabel>
-            <Input
-              id="email"
-              name="email"
-              type="email"
-              placeholder="you@example.com"
-            />
+    <Form {...form}>
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+        <FormField
+          control={form.control}
+          name="fullName"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Full Name</FormLabel>
+              <FormControl>
+                <Input placeholder="John Doe" {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
 
-            <InputFieldError field="email" state={state} />
-          </Field>
-          {/* Password */}
-          <Field className="md:col-span-2">
-            <FieldLabel htmlFor="password">Password</FieldLabel>
-            <Input
-              id="password"
-              name="password"
-              type="password"
-              placeholder="••••••"
-            />
+        <FormField
+          control={form.control}
+          name="email"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Email</FormLabel>
+              <FormControl>
+                <Input placeholder="you@example.com" type="email" {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
 
-            <InputFieldError field="password" state={state} />
-          </Field>
-          {/* Confirm Password */}
-          <Field className="md:col-span-2">
-            <FieldLabel htmlFor="confirmPassword">Confirm Password</FieldLabel>
-            <Input
-              id="confirmPassword"
-              name="confirmPassword"
-              type="password"
-              placeholder="••••••"
-            />
-            <InputFieldError field="confirmPassword" state={state} />
-          </Field>
-        </div>
-        <FieldGroup className="mt-4">
-          <Field>
-            <Button type="submit" disabled={isPending}>
-              {isPending ? "Creating Account..." : "Create Account"}
-            </Button>
+        <FormField
+          control={form.control}
+          name="password"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Password</FormLabel>
+              <FormControl>
+                <Input placeholder="••••••" type="password" {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
 
-            <FieldDescription className="px-6 text-center">
-              Already have an account?{" "}
-              <Link href="/login" className="font-bold hover:underline">
-                Login
-              </Link>
-            </FieldDescription>
-          </Field>
-        </FieldGroup>
-      </FieldGroup>
-    </form>
+        <FormField
+          control={form.control}
+          name="confirmPassword"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Confirm Password</FormLabel>
+              <FormControl>
+                <Input placeholder="••••••" type="password" {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <Button type="submit" className="w-full" disabled={form.formState.isSubmitting}>
+          {form.formState.isSubmitting ? "Creating Account..." : "Create Account"}
+        </Button>
+
+        <p className="px-6 text-center text-sm text-muted-foreground">
+          Already have an account?{" "}
+          <Link href="/login" className="font-bold hover:underline">
+            Login
+          </Link>
+        </p>
+      </form>
+    </Form>
   );
 };
 

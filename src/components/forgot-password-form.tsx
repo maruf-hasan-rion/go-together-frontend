@@ -1,55 +1,77 @@
 "use client";
 
-import { forgotPassword } from "@/services/auth/password";
-import { useActionState, useEffect } from "react";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+import type { z } from "zod";
 import { toast } from "sonner";
 import Link from "next/link";
+
 import { Button } from "./ui/button";
-import { Field, FieldDescription, FieldGroup, FieldLabel } from "./ui/field";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "./ui/form";
 import { Input } from "./ui/input";
-import InputFieldError from "./shared/InputFieldError";
+import { forgotPassword } from "@/services/auth/password";
+import { forgotPasswordZodSchema } from "@/zod/auth.validation";
+
+type ForgotFormValues = z.infer<typeof forgotPasswordZodSchema>;
 
 const ForgotPasswordForm = () => {
-  const [state, formAction, isPending] = useActionState(forgotPassword, null);
+  const form = useForm<ForgotFormValues>({
+    resolver: zodResolver(forgotPasswordZodSchema),
+    defaultValues: { email: "" },
+  });
 
-  useEffect(() => {
-    if (state?.success) {
-      toast.success(state.message);
-    } else if (state && !state.success && state.message) {
-      toast.error(state.message);
+  const onSubmit = async (values: ForgotFormValues) => {
+    const formData = new FormData();
+    formData.set("email", values.email);
+
+    const result = await forgotPassword(null, formData);
+
+    if (result?.success) {
+      toast.success(result.message);
+    } else {
+      for (const error of result?.errors ?? []) {
+        form.setError(error.field as keyof ForgotFormValues, { message: error.message });
+      }
+      if (result?.message) toast.error(result.message);
     }
-  }, [state]);
+  };
 
   return (
-    <form action={formAction}>
-      <FieldGroup>
-        <Field>
-          <FieldLabel htmlFor="email">Email</FieldLabel>
-          <Input
-            id="email"
-            name="email"
-            type="email"
-            placeholder="you@example.com"
-          />
-          <InputFieldError field="email" state={state} />
-        </Field>
+    <Form {...form}>
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+        <FormField
+          control={form.control}
+          name="email"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Email</FormLabel>
+              <FormControl>
+                <Input placeholder="you@example.com" type="email" {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
 
-        <FieldGroup className="mt-4">
-          <Field>
-            <Button type="submit" disabled={isPending}>
-              {isPending ? "Sending..." : "Send reset link"}
-            </Button>
+        <Button type="submit" className="w-full" disabled={form.formState.isSubmitting}>
+          {form.formState.isSubmitting ? "Sending..." : "Send reset link"}
+        </Button>
 
-            <FieldDescription className="px-6 text-center">
-              Remembered it?{" "}
-              <Link href="/login" className="font-bold hover:underline">
-                Back to login
-              </Link>
-            </FieldDescription>
-          </Field>
-        </FieldGroup>
-      </FieldGroup>
-    </form>
+        <p className="px-6 text-center text-sm text-muted-foreground">
+          Remembered it?{" "}
+          <Link href="/login" className="font-bold hover:underline">
+            Back to login
+          </Link>
+        </p>
+      </form>
+    </Form>
   );
 };
 
