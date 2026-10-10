@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 // components/payment/StripePaymentForm.tsx
 "use client";
 
@@ -62,8 +61,8 @@ export function StripePaymentForm({
 
       toast.success("Payment successful!");
       onSuccess();
-    } catch (err: any) {
-      toast.error(err?.message || "Payment confirmed but failed to update booking");
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Payment confirmed but failed to update booking");
     } finally {
       setIsConfirming(false);
       setIsProcessing(false);

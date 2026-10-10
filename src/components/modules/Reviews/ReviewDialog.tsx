@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import { useState } from "react";
@@ -75,8 +74,8 @@ export function ReviewDialog({ eventId }: ReviewDialogProps) {
       setOpen(false);
       form.reset();
       router.refresh(); // refresh UI if needed
-    } catch (error: any) {
-      toast.error(error?.message || "Something went wrong");
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Something went wrong");
     } finally {
       setIsSubmitting(false);
     }

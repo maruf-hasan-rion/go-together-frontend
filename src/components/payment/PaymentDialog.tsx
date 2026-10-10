@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import { useEffect, useState, useCallback } from "react";
@@ -85,8 +84,8 @@ function StripePaymentForm({
 
       toast.success("Payment successful! 🎉");
       onSuccess();
-    } catch (err: any) {
-      toast.error(err?.message || "Booking update failed");
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Booking update failed");
     } finally {
       setIsConfirming(false);
       setIsProcessing(false);
@@ -241,8 +240,8 @@ export function PaymentDialog({
           setPaymentIntentId(data.paymentIntentId);
           setClientSecret(data.clientSecret || "");
           setIsDemoMode(String(data.paymentIntentId).startsWith("demo_pi_"));
-        } catch (err: any) {
-          const msg = err?.message || "Failed to setup payment";
+        } catch (err) {
+          const msg = err instanceof Error ? err.message : "Failed to setup payment";
           toast.error(msg);
           setIsIntentError(true);
 
@@ -270,8 +269,8 @@ export function PaymentDialog({
 
       toast.success("Joined successfully! (Demo) 🎉");
       onSuccess();
-    } catch (err: any) {
-      toast.error(err?.message || "Failed to confirm demo payment");
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Failed to confirm demo payment");
     } finally {
       setIsDemoConfirming(false);
     }

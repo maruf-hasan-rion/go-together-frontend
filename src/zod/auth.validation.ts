@@ -1,5 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-
 import z from "zod";
 
 export const registerValidationZodSchema = z
@@ -19,7 +17,7 @@ export const registerValidationZodSchema = z
         "Confirm Password is required and must be at least 6 characters long",
     }),
   })
-  .refine((data: any) => data.password === data.confirmPassword, {
+  .refine((data) => data.password === data.confirmPassword, {
     error: "Passwords do not match",
     path: ["confirmPassword"],
   });
@@ -53,7 +51,7 @@ export const changePasswordZodSchema = z
       .string()
       .min(6, { message: "Confirm password must be at least 6 characters long" }),
   })
-  .refine((data: any) => data.newPassword === data.confirmPassword, {
+  .refine((data) => data.newPassword === data.confirmPassword, {
     message: "Passwords do not match",
     path: ["confirmPassword"],
   });
@@ -69,7 +67,7 @@ export const resetPasswordZodSchema = z
       .string()
       .min(6, { message: "Confirm password must be at least 6 characters long" }),
   })
-  .refine((data: any) => data.newPassword === data.confirmPassword, {
+  .refine((data) => data.newPassword === data.confirmPassword, {
     message: "Passwords do not match",
     path: ["confirmPassword"],
   });
