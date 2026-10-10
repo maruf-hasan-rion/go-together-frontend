@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 "use server";
 
 import { serverFetch } from "@/lib/server-fetch";
@@ -26,11 +25,11 @@ export async function createPaymentIntent(bookingId: string) {
     }
 
     return result;
-  } catch (error: any) {
+  } catch (error) {
     console.log(error);
     return {
       success: false,
-      message: error.message || "Failed to create payment",
+      message: error instanceof Error ? error.message : "Failed to create payment",
     };
   }
 }
@@ -62,11 +61,11 @@ export async function confirmPayment(paymentIntentId: string) {
     }
 
     return result;
-  } catch (error: any) {
+  } catch (error) {
     console.log(error);
     return {
       success: false,
-      message: error.message || "Payment failed",
+      message: error instanceof Error ? error.message : "Payment failed",
     };
   }
 }
@@ -84,11 +83,11 @@ export async function getPaymentHistory() {
 
     const result = await response.json();
     return result;
-  } catch (error: any) {
+  } catch (error) {
     console.log(error);
     return {
       success: false,
-      message: error.message || "Failed to load payment history",
+      message: error instanceof Error ? error.message : "Failed to load payment history",
     };
   }
 }

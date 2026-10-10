@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 "use server";
 
 import { serverFetch } from "@/lib/server-fetch";
@@ -16,11 +15,11 @@ export async function getEventReviews(eventId: string) {
 
 		const result = await response.json();
 		return result;
-	} catch (error: any) {
+	} catch (error) {
 		console.log(error);
 		return {
 			success: false,
-			message: error.message,
+			message: error instanceof Error ? error.message : "Something went wrong",
 		};
 	}
 }
@@ -37,11 +36,11 @@ export async function getHostReviews(hostId: string) {
 
 		const result = await response.json();
 		return result;
-	} catch (error: any) {
+	} catch (error) {
 		console.log(error);
 		return {
 			success: false,
-			message: error.message,
+			message: error instanceof Error ? error.message : "Something went wrong",
 		};
 	}
 }
@@ -74,11 +73,11 @@ export async function createReview(payload: {
 		}
 
 		return result;
-	} catch (error: any) {
+	} catch (error) {
 		console.log(error);
 		return {
 			success: false,
-			message: error.message,
+			message: error instanceof Error ? error.message : "Something went wrong",
 		};
 	}
 }
@@ -94,11 +93,11 @@ export async function getMyReviewForEvent(eventId: string) {
 
 		const result = await response.json();
 		return result;
-	} catch (error: any) {
+	} catch (error) {
 		console.log(error);
 		return {
 			success: false,
-			message: error.message,
+			message: error instanceof Error ? error.message : "Something went wrong",
 		};
 	}
 }
@@ -115,11 +114,11 @@ export async function getPublicTestimonials() {
 
 		const result = await response.json();
 		return result;
-	} catch (error: any) {
+	} catch (error) {
 		console.log(error);
 		return {
 			success: false,
-			message: error.message,
+			message: error instanceof Error ? error.message : "Something went wrong",
 		};
 	}
 }

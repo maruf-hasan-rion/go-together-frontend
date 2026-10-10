@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 "use server";
 
 import { serverFetch } from "@/lib/server-fetch";
@@ -15,10 +14,10 @@ export async function getAllUsers(queryString?: string) {
 		);
 		const result = await response.json();
 		return result;
-	} catch (error: any) {
+	} catch (error) {
 		return {
 			success: false,
-			message: error.message,
+			message: error instanceof Error ? error.message : "Something went wrong",
 		};
 	}
 }
@@ -36,10 +35,10 @@ export async function suspendClient(clientId: string) {
 			revalidateTag("all-host-applications", { expire: 0 });
 		}
 		return result;
-	} catch (error: any) {
+	} catch (error) {
 		return {
 			success: false,
-			message: error.message,
+			message: error instanceof Error ? error.message : "Something went wrong",
 		};
 	}
 }
@@ -60,10 +59,10 @@ export async function unsuspendClient(clientId: string) {
 			revalidateTag("all-host-applications", { expire: 0 });
 		}
 		return result;
-	} catch (error: any) {
+	} catch (error) {
 		return {
 			success: false,
-			message: error.message,
+			message: error instanceof Error ? error.message : "Something went wrong",
 		};
 	}
 }
@@ -79,10 +78,10 @@ export async function getAllHosts(queryString?: string) {
 		);
 		const result = await response.json();
 		return result;
-	} catch (error: any) {
+	} catch (error) {
 		return {
 			success: false,
-			message: error.message,
+			message: error instanceof Error ? error.message : "Something went wrong",
 		};
 	}
 }
@@ -98,10 +97,10 @@ export async function getAllHostApplications(queryString?: string) {
 		);
 		const result = await response.json();
 		return result;
-	} catch (error: any) {
+	} catch (error) {
 		return {
 			success: false,
-			message: error.message,
+			message: error instanceof Error ? error.message : "Something went wrong",
 		};
 	}
 }
@@ -122,10 +121,10 @@ export async function approveHostApplication(applicationId: string) {
 			revalidateTag("all-clients", { expire: 0 });
 		}
 		return result;
-	} catch (error: any) {
+	} catch (error) {
 		return {
 			success: false,
-			message: error.message,
+			message: error instanceof Error ? error.message : "Something went wrong",
 		};
 	}
 }
@@ -146,10 +145,10 @@ export async function rejectHostApplication(applicationId: string) {
 			revalidateTag("all-clients", { expire: 0 });
 		}
 		return result;
-	} catch (error: any) {
+	} catch (error) {
 		return {
 			success: false,
-			message: error.message,
+			message: error instanceof Error ? error.message : "Something went wrong",
 		};
 	}
 }
