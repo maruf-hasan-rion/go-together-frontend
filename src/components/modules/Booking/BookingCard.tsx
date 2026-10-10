@@ -332,7 +332,7 @@ export function BookingCard({ booking }: BookingCardProps) {
           onOpenChange={setShowPaymentDialog}
           onSuccess={() => {
             setShowPaymentDialog(false);
-            router.refresh();
+            router.push(`/payment/success?bookingId=${booking.id}`);
           }}
         />
       )}
