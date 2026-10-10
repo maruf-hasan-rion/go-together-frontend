@@ -12,7 +12,7 @@ export const metadata: Metadata = {
 
 export default async function MyEventsPage() {
 	const userInfo = await getUserInfo();
-	const user = userInfo?.data ?? userInfo; // (depending on your API shape)
+	const user = userInfo;
 	const isAuthenticated = !!user?.id;
 
 	// If not logged in -> render client with empty data, it will show login UI

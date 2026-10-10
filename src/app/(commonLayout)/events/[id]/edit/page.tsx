@@ -25,8 +25,8 @@ export default async function EditEventPage({
 
   const event = eventRes?.data ?? null;
 
-  // your getUserInfo might return {data: user} or direct user
-  const user = userRes?.data ?? userRes ?? null;
+  // Not logged in -> go login
+  const user = userRes ?? null;
 
   // Not logged in -> go login
   if (!user?.id) redirect("/login");
