@@ -6,6 +6,7 @@ import { getMyReviewForEvent } from "@/services/reviews/reviews";
 import { getUserInfo } from "@/services/auth/getUserInfo";
 // import { ApiParticipantInfo } from "@/types/event.interface";
 import EventDetailsCard from "@/components/modules/Events/EventDetailsCard";
+import EventReviews from "@/components/modules/Reviews/EventReviews";
 import { Metadata } from "next";
 
 export const metadata: Metadata = {
@@ -42,7 +43,14 @@ export default async function EventDetailsPage({
 	const hasReviewed = !!reviewRes?.data;
 
 	return (
-		<EventDetailsCard event={event} userId={userId} hasReviewed={hasReviewed} />
+		<div className="space-y-6">
+			<EventDetailsCard event={event} userId={userId} hasReviewed={hasReviewed} />
+			{event?.id && (
+				<div className="mx-auto max-w-4xl px-4 pb-12">
+					<EventReviews eventId={event.id} />
+				</div>
+			)}
+		</div>
 	);
 }
 // const formatDate = (iso?: string) => {

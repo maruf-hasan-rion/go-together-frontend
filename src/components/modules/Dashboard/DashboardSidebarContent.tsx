@@ -5,16 +5,13 @@ import { Separator } from "@/components/ui/separator";
 import { Button } from "@/components/ui/button";
 import { getIconComponent } from "@/lib/icon-mapper";
 import { cn } from "@/lib/utils";
-import { useUiStore } from "@/stores/use-ui-store";
+import { useUi } from "@/providers/ui-provider";
 import { NavSection } from "@/types/dashboard.interface";
 import { UserInfo } from "@/types/user.interface";
 import { PanelLeftClose, PanelLeftOpen } from "lucide-react";
 import { ScrollArea } from "@radix-ui/react-scroll-area";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useSyncExternalStore } from "react";
-
-const emptySubscribe = () => () => {};
 
 interface DashboardSidebarContentProps {
   userInfo: UserInfo;
@@ -27,16 +24,7 @@ const DashboardSidebarContent = ({
   navItems,
 }: DashboardSidebarContentProps) => {
   const pathname = usePathname();
-  const { sidebarCollapsed, toggleSidebar } = useUiStore();
-
-  // The store is hydrated from localStorage on the client. Render the default
-  // state on the server / first paint to avoid a hydration mismatch.
-  const hydrated = useSyncExternalStore(
-    emptySubscribe,
-    () => true,
-    () => false,
-  );
-  const collapsed = hydrated && sidebarCollapsed;
+  const { sidebarCollapsed: collapsed, toggleSidebar } = useUi();
 
   return (
     <div
