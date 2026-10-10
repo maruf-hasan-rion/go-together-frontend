@@ -10,14 +10,13 @@ import { revalidateTag } from "next/cache";
 // import { changePasswordSchema } from './../../zod/auth.validation';
 import { deleteCookie, getCookie, setCookie } from "./tokenHandlers";
 
-/* eslint-disable @typescript-eslint/no-explicit-any */
 export async function updateMyProfile(formData: FormData) {
   try {
     // Create a new FormData with the data property
     const uploadFormData = new FormData();
 
     // Get all form fields except the file
-    const data: any = {};
+    const data: Record<string, FormDataEntryValue> = {};
     formData.forEach((value, key) => {
       if (key !== "file" && value) {
         data[key] = value;
@@ -43,13 +42,15 @@ export async function updateMyProfile(formData: FormData) {
       revalidateTag("user-info", { expire: 0 });
     }
     return result;
-  } catch (error: any) {
+  } catch (error) {
     console.log(error);
     return {
       success: false,
       message: `${
         process.env.NODE_ENV === "development"
-          ? error.message
+          ? error instanceof Error
+            ? error.message
+            : "Something went wrong"
           : "Something went wrong"
       }`,
     };
@@ -181,8 +182,8 @@ export async function getNewAccessToken() {
 
     // Now we know: accessToken is invalid/missing AND refreshToken exists
     // Safe to call the API
-    let accessTokenObject: null | any = null;
-    let refreshTokenObject: null | any = null;
+    let accessTokenObject: Record<string, string | undefined> | null = null;
+    let refreshTokenObject: Record<string, string | undefined> | null = null;
 
     // API Call - serverFetch will skip getNewAccessToken for /auth/refresh-token endpoint
     const response = await serverFetch.post("/auth/refresh-token", {
@@ -195,46 +196,44 @@ export async function getNewAccessToken() {
 
     const setCookieHeaders = response.headers.getSetCookie();
 
-    if (setCookieHeaders && setCookieHeaders.length > 0) {
-      setCookieHeaders.forEach((cookie: string) => {
-        const parsedCookie = parse(cookie);
-
-        if (parsedCookie["accessToken"]) {
-          accessTokenObject = parsedCookie;
-        }
-        if (parsedCookie["refreshToken"]) {
-          refreshTokenObject = parsedCookie;
-        }
-      });
-    } else {
+    if (!setCookieHeaders || setCookieHeaders.length === 0) {
       throw new Error("No Set-Cookie header found");
     }
 
-    if (!accessTokenObject) {
+    for (const cookie of setCookieHeaders) {
+      const parsedCookie = parse(cookie);
+      if (parsedCookie["accessToken"]) accessTokenObject = parsedCookie;
+      if (parsedCookie["refreshToken"]) refreshTokenObject = parsedCookie;
+    }
+
+    if (!accessTokenObject || !refreshTokenObject) {
       throw new Error("Tokens not found in cookies");
     }
 
-    if (!refreshTokenObject) {
+    const newAccessToken = accessTokenObject["accessToken"];
+    const newRefreshTokenValue = refreshTokenObject["refreshToken"];
+
+    if (!newAccessToken || !newRefreshTokenValue) {
       throw new Error("Tokens not found in cookies");
     }
 
     await deleteCookie("accessToken");
-    await setCookie("accessToken", accessTokenObject.accessToken, {
+    await setCookie("accessToken", newAccessToken, {
       secure: true,
       httpOnly: true,
-      maxAge: parseInt(accessTokenObject["Max-Age"]) || 1000 * 60 * 60,
-      path: accessTokenObject.Path || "/",
-      sameSite: accessTokenObject["SameSite"] || "none",
+      maxAge: parseInt(accessTokenObject?.["Max-Age"] ?? "") || 1000 * 60 * 60,
+      path: accessTokenObject?.Path || "/",
+      sameSite: (accessTokenObject?.["SameSite"] as "lax" | "strict" | "none") || "none",
     });
 
     await deleteCookie("refreshToken");
-    await setCookie("refreshToken", refreshTokenObject.refreshToken, {
+    await setCookie("refreshToken", newRefreshTokenValue, {
       secure: true,
       httpOnly: true,
       maxAge:
-        parseInt(refreshTokenObject["Max-Age"]) || 1000 * 60 * 60 * 24 * 90,
-      path: refreshTokenObject.Path || "/",
-      sameSite: refreshTokenObject["SameSite"] || "none",
+        parseInt(refreshTokenObject?.["Max-Age"] ?? "") || 1000 * 60 * 60 * 24 * 90,
+      path: refreshTokenObject?.Path || "/",
+      sameSite: (refreshTokenObject?.["SameSite"] as "lax" | "strict" | "none") || "none",
     });
 
     if (!result.success) {
@@ -246,11 +245,11 @@ export async function getNewAccessToken() {
       success: true,
       message: "Token refreshed successfully",
     };
-  } catch (error: any) {
+  } catch (error) {
     return {
       tokenRefreshed: false,
       success: false,
-      message: error?.message || "Something went wrong",
+      message: error instanceof Error ? error.message : "Something went wrong",
     };
   }
 }

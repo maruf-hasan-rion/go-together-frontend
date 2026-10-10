@@ -1,4 +1,4 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
+type UnknownRecord = Record<string, unknown>;
 
 /**
  * The API envelope has two shapes in the wild:
@@ -6,22 +6,30 @@
  *   old:  { success, message, data: { meta, <key>: [...] } }
  * These helpers read a list/meta from either, so the UI keeps working while the
  * backend deploy catches up.
+ *
+ * `T` defaults to `never` so an unparameterised call stays assignable to any
+ * expected array type at the call site.
  */
-export function unwrapList<T = any>(res: any, key?: string): T[] {
-  const data = res?.data;
+export function unwrapList<T = never>(res: unknown, key?: string): T[] {
+  const data = (res as UnknownRecord | null)?.data;
 
   if (Array.isArray(data)) return data as T[];
 
-  if (key && Array.isArray(data?.[key])) return data[key] as T[];
-
   if (data && typeof data === "object") {
-    const firstArray = Object.values(data).find((value) => Array.isArray(value));
+    const record = data as UnknownRecord;
+    if (key && Array.isArray(record[key])) return record[key] as T[];
+    const firstArray = Object.values(record).find((value) => Array.isArray(value));
     if (Array.isArray(firstArray)) return firstArray as T[];
   }
 
   return [];
 }
 
-export function unwrapMeta(res: any): { page: number; limit: number; total: number } {
-  return res?.meta ?? res?.data?.meta ?? { page: 1, limit: 9, total: 0 };
+export function unwrapMeta(res: unknown): { page: number; limit: number; total: number } {
+  const record = res as UnknownRecord | null;
+  const meta = (record?.meta ?? (record?.data as UnknownRecord | undefined)?.meta) as
+    | { page?: number; limit?: number; total?: number }
+    | undefined;
+
+  return { page: meta?.page ?? 1, limit: meta?.limit ?? 9, total: meta?.total ?? 0 };
 }
