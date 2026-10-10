@@ -4,17 +4,16 @@ import { AdminAnalyticsData } from "@/types/meta.interface";
 import { Suspense } from "react";
 
 export const dynamic = "force-dynamic";
-export const revalidate = 0; 
-
-
+export const revalidate = 0;
 
 const AdminDashboardPage = async () => {
-  const response = await getAnalytics();
-  const analytics = response.data as AdminAnalyticsData;
-  <Suspense fallback={<div>Loading...</div>}>
-      <AdminDashboard analytics={analytics} />
-  </Suspense>
-  
+	const response = await getAnalytics();
+	const analytics = response.data as AdminAnalyticsData;
+	return (
+		<Suspense fallback={<div>Loading...</div>}>
+			<AdminDashboard analytics={analytics} />
+		</Suspense>
+	);
 };
 
 export default AdminDashboardPage;
