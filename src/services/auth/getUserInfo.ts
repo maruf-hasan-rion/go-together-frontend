@@ -20,7 +20,9 @@ export const getUserInfo = async (): Promise<UserInfo> => {
       fullName: result.data.fullName || "Unknown User",
     };
   } catch (error) {
-    console.log(error);
+    // Log the message only: logging the Error object makes the Next dev overlay
+    // fail to resolve a source map and print a misleading "Invalid source map".
+    console.log("getUserInfo:", error instanceof Error ? error.message : error);
     return {
       id: "",
       fullName: "Unknown User",
