@@ -16,6 +16,7 @@ import {
 import { AdminAnalyticsData } from "@/types/meta.interface";
 import AdminCharts from "@/components/modules/Admin/AdminCharts";
 import AdminFeatures from "@/components/modules/Admin/AdminFeatures";
+import { toNumber } from "@/lib/utils";
 
 const AdminDashboard = ({ analytics }: { analytics: AdminAnalyticsData }) => {
 
@@ -83,13 +84,13 @@ const AdminDashboard = ({ analytics }: { analytics: AdminAnalyticsData }) => {
         />
         <StatCard
           title="Total Income"
-          value={`৳${Number(analytics?.totalPaymentsIncome ?? 0).toLocaleString()}`}
+          value={`৳${toNumber(analytics?.totalPaymentsIncome).toLocaleString()}`}
           icon={DollarSign}
           color="bg-gradient-to-br from-emerald-500 to-emerald-600"
         />
         <StatCard
           title="Admin Income"
-          value={`৳${Number(analytics?.totalAdminIncome ?? 0).toLocaleString()}`}
+          value={`৳${toNumber(analytics?.totalAdminIncome).toLocaleString()}`}
           icon={Wallet}
           color="bg-gradient-to-br from-teal-500 to-teal-600"
         />

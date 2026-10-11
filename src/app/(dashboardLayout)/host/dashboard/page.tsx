@@ -1,4 +1,5 @@
 import { StatCard } from "@/components/modules/Analytics/StatCard";
+import { toNumber } from "@/lib/utils";
 import { getAnalytics } from "@/services/analytics/analytics.service";
 import { HostAnalyticsData } from "@/types/meta.interface";
 import {
@@ -52,7 +53,7 @@ const HostDashboardPage = async () => {
               <Wallet className="h-4 w-4 text-[#45aaa2]" />
               <span className="text-muted-foreground">Income</span>
               <span className="font-semibold">
-                ৳{Number(analytics.hostIncome ?? 0).toLocaleString()}
+                ৳{toNumber(analytics.hostIncome).toLocaleString()}
               </span>
             </div>
             <div className="inline-flex items-center gap-2 rounded-full border px-3 py-1.5 text-xs bg-muted/40">
@@ -83,7 +84,7 @@ const HostDashboardPage = async () => {
         />
         <StatCard
           title="Your Income"
-          value={`৳${Number(analytics.hostIncome ?? 0).toLocaleString()}`}
+          value={`৳${toNumber(analytics.hostIncome).toLocaleString()}`}
           icon={Wallet}
           color="bg-gradient-to-br from-teal-500 to-teal-600"
         />
@@ -116,7 +117,7 @@ const HostDashboardPage = async () => {
         />
         <StatCard
           title="Total Revenue"
-          value={`৳${Number(analytics.totalPaymentsIncome ?? 0).toLocaleString()}`}
+          value={`৳${toNumber(analytics.totalPaymentsIncome).toLocaleString()}`}
           icon={DollarSign}
           color="bg-gradient-to-br from-emerald-500 to-emerald-600"
         />

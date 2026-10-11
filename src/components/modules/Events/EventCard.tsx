@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Star, MapPin, Calendar, Clock } from "lucide-react";
 import { Event } from "@/types/event.interface";
 import Link from "next/link";
+import { toNumber } from "@/lib/utils";
 
 // type Host = Event;
 type EventCardProps = {
@@ -54,7 +55,7 @@ export default function EventCard({ event }: EventCardProps) {
   const image = getImageSrc(event?.image);
   const categories: string[] = event?.type || [];
   const { date, time } = formatDate(event?.eventDate);
-  const fee = Number(event?.joiningFee ?? 0);
+  const fee = toNumber(event?.joiningFee);
   const capacity = event?.maxParticipants ?? null;
 
   const status = useMemo(() => {

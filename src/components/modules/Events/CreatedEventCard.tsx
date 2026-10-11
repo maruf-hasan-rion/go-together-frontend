@@ -9,6 +9,7 @@ import {Event} from "@/types/event.interface";
 import { toast } from "sonner";
 import { deleteEvent, completeEvent } from "@/services/events/events";
 import EventFormDialog from "./EventFormDialog";
+import { toNumber } from "@/lib/utils";
 
 type CreatedEventCardProps = {
     event: Event;
@@ -36,7 +37,7 @@ export default function CreatedEventCard({ event }: CreatedEventCardProps) {
     const image = event?.image || "/images/event-placeholder.jpg";
     const categories: string[] = event?.type || [];
     const { date, time } = formatDate(event?.eventDate);
-    const fee = Number(event?.joiningFee ?? 0);
+    const fee = toNumber(event?.joiningFee);
     const capacity = event?.maxParticipants ?? null;
     const status = event?.status || "PENDING";
 

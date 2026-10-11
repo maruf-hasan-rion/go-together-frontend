@@ -24,6 +24,7 @@ import {
 import { toast } from "sonner";
 import { loadStripe } from "@stripe/stripe-js";
 import { Elements, PaymentElement, useStripe, useElements } from "@stripe/react-stripe-js";
+import { toNumber } from "@/lib/utils";
 
 // ✅ rename imports to avoid conflict
 import {
@@ -143,7 +144,7 @@ function StripePaymentForm({
       {/* Amount Summary */}
       <div className="flex items-center justify-between p-4 bg-muted/50 rounded-lg border">
         <span className="text-sm font-medium">Total Amount</span>
-        <span className="text-2xl font-bold text-primary">${(Number(amount) || 0).toLocaleString()}</span>
+        <span className="text-2xl font-bold text-primary">${toNumber(amount).toLocaleString()}</span>
       </div>
 
       {/* Action Buttons */}
@@ -170,7 +171,7 @@ function StripePaymentForm({
           ) : (
             <>
               <Lock className="h-4 w-4" />
-              Pay ${(Number(amount) || 0).toLocaleString()}
+              Pay ${toNumber(amount).toLocaleString()}
             </>
           )}
         </Button>
@@ -313,7 +314,7 @@ export function PaymentDialog({
               Total Amount
             </p>
             <p className="text-5xl font-bold bg-linear-to-r from-primary to-purple-600 bg-clip-text text-transparent">
-              ${(Number(amount) || 0).toLocaleString()}
+              ${toNumber(amount).toLocaleString()}
             </p>
             <p className="text-xs text-muted-foreground mt-2">
               One-time payment • No hidden fees
