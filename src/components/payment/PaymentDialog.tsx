@@ -52,6 +52,7 @@ function StripePaymentForm({
   const [isProcessing, setIsProcessing] = useState(false);
   const [isConfirming, setIsConfirming] = useState(false);
   const [paymentReady, setPaymentReady] = useState(false);
+  const [loadError, setLoadError] = useState<string | null>(null);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -101,6 +102,9 @@ function StripePaymentForm({
       <div className="relative">
         <PaymentElement
           onReady={() => setPaymentReady(true)}
+          onLoadError={(event) => {
+            setLoadError(event.error?.message ?? "Unable to load the payment form");
+          }}
           options={{
             layout: {
               type: "tabs",
@@ -108,14 +112,24 @@ function StripePaymentForm({
             },
           }}
         />
-        {!paymentReady && (
+        {loadError ? (
+          <div className="absolute inset-0 rounded-lg bg-background/95 flex items-center justify-center p-4">
+            <div className="text-center">
+              <AlertCircle className="h-8 w-8 text-red-600 mx-auto mb-2" />
+              <p className="text-sm font-medium text-foreground mb-1">
+                Payment form failed to load
+              </p>
+              <p className="text-xs text-muted-foreground">{loadError}</p>
+            </div>
+          </div>
+        ) : !paymentReady ? (
           <div className="absolute inset-0 bg-background/80 backdrop-blur-sm flex items-center justify-center rounded-lg">
             <div className="text-center">
               <Loader2 className="h-8 w-8 animate-spin text-primary mx-auto mb-2" />
               <p className="text-sm text-muted-foreground">Loading payment form...</p>
             </div>
           </div>
-        )}
+        ) : null}
       </div>
 
       {/* Security Badge */}
