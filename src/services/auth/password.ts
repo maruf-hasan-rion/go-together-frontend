@@ -1,6 +1,7 @@
 "use server";
 
 import { serverFetch } from "@/lib/server-fetch";
+import { deleteCookie } from "@/services/auth/tokenHandlers";
 import { zodValidator } from "@/lib/zodValidator";
 import {
   changePasswordZodSchema,
@@ -94,6 +95,14 @@ export const changePassword = async (
     });
 
     const result = await response.json();
+
+    // The backend revoked every session. Clear this deployment's own cookies
+    // too, otherwise the proxy still sees a valid accessToken and bounces
+    // /login back to the dashboard, so the change never appears to take effect.
+    if (result?.success) {
+      await deleteCookie("accessToken");
+      await deleteCookie("refreshToken");
+    }
 
     return {
       success: Boolean(result?.success),
