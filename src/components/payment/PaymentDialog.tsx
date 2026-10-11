@@ -31,7 +31,8 @@ import {
   confirmPayment as confirmPaymentServer,
 } from "@/services/payment/payment";
 
-const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!);
+const stripePublishableKey = process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY;
+const stripePromise = stripePublishableKey ? loadStripe(stripePublishableKey) : null;
 
 // Stripe Payment Form Component
 function StripePaymentForm({
@@ -372,7 +373,7 @@ export function PaymentDialog({
                 Cancel
               </Button>
             </div>
-          ) : clientSecret && paymentIntentId ? (
+          ) : clientSecret && paymentIntentId && stripePromise ? (
             <Elements
               stripe={stripePromise}
               options={{
@@ -397,6 +398,20 @@ export function PaymentDialog({
               <p className="font-medium text-foreground mb-2">Payment Setup Failed</p>
               <p className="text-sm text-muted-foreground mb-6">
                 We couldn&apos;t initialize the payment. Please try again.
+              </p>
+              <Button onClick={() => handleDialogChange(false)} variant="outline">
+                Close
+              </Button>
+            </div>
+          ) : clientSecret && !stripePromise ? (
+            <div className="text-center py-8">
+              <div className="w-16 h-16 rounded-full bg-orange-100 flex items-center justify-center mx-auto mb-4">
+                <AlertCircle className="h-8 w-8 text-orange-600" />
+              </div>
+              <p className="font-medium text-foreground mb-2">Payments are not configured</p>
+              <p className="text-sm text-muted-foreground mb-6">
+                Set <code>NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY</code> to the publishable key that
+                matches the backend&apos;s Stripe secret key.
               </p>
               <Button onClick={() => handleDialogChange(false)} variant="outline">
                 Close
