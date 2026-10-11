@@ -83,13 +83,13 @@ const AdminDashboard = ({ analytics }: { analytics: AdminAnalyticsData }) => {
         />
         <StatCard
           title="Total Income"
-          value={`৳${(analytics?.totalPaymentsIncome ?? 0).toLocaleString()}`}
+          value={`৳${Number(analytics?.totalPaymentsIncome ?? 0).toLocaleString()}`}
           icon={DollarSign}
           color="bg-gradient-to-br from-emerald-500 to-emerald-600"
         />
         <StatCard
           title="Admin Income"
-          value={`৳${(analytics?.totalAdminIncome ?? 0).toLocaleString()}`}
+          value={`৳${Number(analytics?.totalAdminIncome ?? 0).toLocaleString()}`}
           icon={Wallet}
           color="bg-gradient-to-br from-teal-500 to-teal-600"
         />

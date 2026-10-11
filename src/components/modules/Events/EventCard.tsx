@@ -54,7 +54,7 @@ export default function EventCard({ event }: EventCardProps) {
   const image = getImageSrc(event?.image);
   const categories: string[] = event?.type || [];
   const { date, time } = formatDate(event?.eventDate);
-  const fee = event?.joiningFee ?? 0;
+  const fee = Number(event?.joiningFee ?? 0);
   const capacity = event?.maxParticipants ?? null;
 
   const status = useMemo(() => {

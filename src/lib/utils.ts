@@ -15,11 +15,12 @@ export function formatDate(date: string | Date) {
 }
 
 // Format Currency → "$120.00"
-export function formatCurrency(amount: number) {
+export function formatCurrency(amount: number | string | null | undefined) {
+  const value = Number(amount);
   return new Intl.NumberFormat("en-US", {
     style: "currency",
     currency: "USD",
-  }).format(amount);
+  }).format(Number.isFinite(value) ? value : 0);
 }
 // Format date & time nicely
 export const formatDateTime = (dateStr: string | Date) => {

@@ -52,7 +52,7 @@ const HostDashboardPage = async () => {
               <Wallet className="h-4 w-4 text-[#45aaa2]" />
               <span className="text-muted-foreground">Income</span>
               <span className="font-semibold">
-                ৳{(analytics.hostIncome ?? 0).toLocaleString()}
+                ৳{Number(analytics.hostIncome ?? 0).toLocaleString()}
               </span>
             </div>
             <div className="inline-flex items-center gap-2 rounded-full border px-3 py-1.5 text-xs bg-muted/40">
@@ -83,7 +83,7 @@ const HostDashboardPage = async () => {
         />
         <StatCard
           title="Your Income"
-          value={`৳${(analytics.hostIncome ?? 0).toLocaleString()}`}
+          value={`৳${Number(analytics.hostIncome ?? 0).toLocaleString()}`}
           icon={Wallet}
           color="bg-gradient-to-br from-teal-500 to-teal-600"
         />
@@ -116,7 +116,7 @@ const HostDashboardPage = async () => {
         />
         <StatCard
           title="Total Revenue"
-          value={`৳${(analytics.totalPaymentsIncome ?? 0).toLocaleString()}`}
+          value={`৳${Number(analytics.totalPaymentsIncome ?? 0).toLocaleString()}`}
           icon={DollarSign}
           color="bg-gradient-to-br from-emerald-500 to-emerald-600"
         />

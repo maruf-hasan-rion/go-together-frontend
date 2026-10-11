@@ -143,7 +143,7 @@ function StripePaymentForm({
       {/* Amount Summary */}
       <div className="flex items-center justify-between p-4 bg-muted/50 rounded-lg border">
         <span className="text-sm font-medium">Total Amount</span>
-        <span className="text-2xl font-bold text-primary">${amount.toLocaleString()}</span>
+        <span className="text-2xl font-bold text-primary">${(Number(amount) || 0).toLocaleString()}</span>
       </div>
 
       {/* Action Buttons */}
@@ -170,7 +170,7 @@ function StripePaymentForm({
           ) : (
             <>
               <Lock className="h-4 w-4" />
-              Pay ${amount.toLocaleString()}
+              Pay ${(Number(amount) || 0).toLocaleString()}
             </>
           )}
         </Button>
@@ -313,7 +313,7 @@ export function PaymentDialog({
               Total Amount
             </p>
             <p className="text-5xl font-bold bg-linear-to-r from-primary to-purple-600 bg-clip-text text-transparent">
-              ${amount.toLocaleString()}
+              ${(Number(amount) || 0).toLocaleString()}
             </p>
             <p className="text-xs text-muted-foreground mt-2">
               One-time payment • No hidden fees
