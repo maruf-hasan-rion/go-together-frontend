@@ -6,8 +6,8 @@
  */
 export const DEMO_CREDENTIALS = {
   ADMIN: { email: "admin@gmail.com", password: "123456" },
-  HOST: { email: "host@gotogether.dev", password: "Demo@1234" },
-  USER: { email: "user@gotogether.dev", password: "Demo@1234" },
+  HOST: { email: "host@gmail.com", password: "123456" },
+  USER: { email: "user@gmail.com", password: "123456" },
 } as const;
 
 export type DemoRole = keyof typeof DEMO_CREDENTIALS;
