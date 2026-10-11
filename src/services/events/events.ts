@@ -50,8 +50,7 @@ export async function getMyBookedEvents(queryString?: string) {
 		const response = await serverFetch.get(
 			`/event/my-events${queryString ? `?${queryString}` : ""}`,
 			{
-				cache: "force-cache",
-				next: { tags: ["my-booked-events"] },
+				cache: "no-store",
 			},
 		);
 		const result = await response.json();
@@ -70,8 +69,7 @@ export async function getMyHostedEvents(queryString?: string) {
 		const response = await serverFetch.get(
 			`/event/my-hosted-events${queryString ? `?${queryString}` : ""}`,
 			{
-				cache: "force-cache",
-				next: { tags: ["my-hosted-events"] },
+				cache: "no-store",
 			},
 		);
 		const result = await response.json();
@@ -107,8 +105,7 @@ export async function getEventParticipants(id: string, queryString?: string) {
 		const response = await serverFetch.get(
 			`/event/${id}/participants${queryString ? `?${queryString}` : ""}`,
 			{
-				cache: "force-cache",
-				next: { tags: ["event-participants"] },
+				cache: "no-store",
 			},
 		);
 		const result = await response.json();

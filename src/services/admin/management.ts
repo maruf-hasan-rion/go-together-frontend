@@ -72,8 +72,7 @@ export async function getAllHosts(queryString?: string) {
 		const response = await serverFetch.get(
 			`/admin/hosts${queryString ? `?${queryString}` : ""}`,
 			{
-				cache: "force-cache",
-				next: { tags: ["all-hosts"] },
+				cache: "no-store",
 			},
 		);
 		const result = await response.json();
@@ -91,8 +90,7 @@ export async function getAllHostApplications(queryString?: string) {
 		const response = await serverFetch.get(
 			`/admin/host-applications${queryString ? `?${queryString}` : ""}`,
 			{
-				cache: "force-cache",
-				next: { tags: ["all-host-applications"] },
+				cache: "no-store",
 			},
 		);
 		const result = await response.json();

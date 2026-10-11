@@ -30,8 +30,7 @@ export interface Booking {
 export async function getMyBookings() {
   try {
     const response = await serverFetch.get("/bookings/my-bookings", {
-      cache: "force-cache",
-      next: { tags: ["user-bookings"] },
+      cache: "no-store",
     });
 
     const result = await response.json();

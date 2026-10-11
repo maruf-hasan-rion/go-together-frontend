@@ -77,8 +77,7 @@ export async function confirmPayment(paymentIntentId: string) {
 export async function getPaymentHistory() {
   try {
     const response = await serverFetch.get("/payments/history", {
-      cache: "force-cache",
-      next: { tags: ["payments"] },
+      cache: "no-store",
     });
 
     const result = await response.json();
