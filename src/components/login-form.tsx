@@ -19,7 +19,8 @@ import { Input } from "./ui/input";
 import Link from "next/link";
 import GoogleLoginButton from "./google-login-button";
 import { loginUser } from "@/services/auth/loginUser";
-import { demoLogin, DEMO_CREDENTIALS, type DemoRole } from "@/services/auth/demoLogin";
+import { demoLogin } from "@/services/auth/demoLogin";
+import { DEMO_CREDENTIALS, type DemoRole } from "@/lib/demo-credentials";
 import { loginValidationZodSchema } from "@/zod/auth.validation";
 
 type LoginFormValues = z.infer<typeof loginValidationZodSchema>;

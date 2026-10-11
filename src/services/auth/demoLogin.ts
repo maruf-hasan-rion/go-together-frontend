@@ -1,20 +1,12 @@
 "use server";
 
+import { DEMO_CREDENTIALS, type DemoRole } from "@/lib/demo-credentials";
 import { loginUser } from "./loginUser";
 
 /**
- * Demo credentials match the accounts created by `pnpm run seed` on the
- * backend (prisma/seed.ts). Each entry is a real user in the database, so the
- * one-click login exercises the full auth flow.
+ * Logs in as a demo account. Each entry is a real user in the database
+ * (created by `pnpm run seed`), so this exercises the full auth flow.
  */
-export const DEMO_CREDENTIALS = {
-  ADMIN: { email: "admin@gotogether.dev", password: "Demo@1234" },
-  HOST: { email: "host@gotogether.dev", password: "Demo@1234" },
-  USER: { email: "user@gotogether.dev", password: "Demo@1234" },
-} as const;
-
-export type DemoRole = keyof typeof DEMO_CREDENTIALS;
-
 export const demoLogin = async (role: DemoRole) => {
   const credentials = DEMO_CREDENTIALS[role];
 
